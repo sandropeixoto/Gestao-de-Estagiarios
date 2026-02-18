@@ -15,9 +15,9 @@ $uri = explode('/', $uri);
 $resource = isset($uri[1]) ? $uri[1] : null;
 $action = isset($uri[2]) ? $uri[2] : null;
 
-// Fallback if running in a subdirectory and index 1 is empty or 'backend'
+// Fallback if running in a subdirectory and index 1 is empty, 'backend', or 'api'
 // This is a simple heuristic; a robust router would be better but keeping it simple for now.
-if ($resource === 'backend' || $resource === '') {
+if ($resource === 'backend' || $resource === 'api' || $resource === '') {
     $resource = isset($uri[2]) ? $uri[2] : null;
     $action = isset($uri[3]) ? $uri[3] : null;
 }
