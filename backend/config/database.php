@@ -2,11 +2,21 @@
 class Database
 {
     // Supabase Credentials
-    private $host = "db.vpwjcgxtgpzicvgmatll.supabase.co";
-    private $db_name = "postgres"; // Standard Supabase DB name
-    private $username = "postgres";
-    private $password = "FLpEMiCSTw88gRD2"; // User needs to update this
-    private $port = "5432";
+    // Supabase Credentials (via Env Vars)
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
+    private $port;
+
+    public function __construct()
+    {
+        $this->host = getenv('DB_HOST') ?: "db.vpwjcgxtgpzicvgmatll.supabase.co";
+        $this->db_name = getenv('DB_NAME') ?: "postgres";
+        $this->username = getenv('DB_USER') ?: "postgres";
+        $this->password = getenv('DB_PASS') ?: "FLpEMiCSTw88gRD2";
+        $this->port = getenv('DB_PORT') ?: "5432";
+    }
     public $conn;
     public $debug = true;
 
