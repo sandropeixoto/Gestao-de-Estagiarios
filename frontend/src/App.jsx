@@ -10,10 +10,6 @@ import FinancialModule from './pages/FinancialModule';
 import Layout from './components/Layout';
 import DashboardOverview from './pages/DashboardOverview';
 import StudentsList from './pages/StudentsList';
-import InstitutionsList from './pages/InstitutionsList';
-import SupervisorsList from './pages/SupervisorsList';
-import ContractsList from './pages/ContractsList';
-
 import StudentForm from './pages/StudentForm';
 import InstitutionForm from './pages/InstitutionForm';
 import SupervisorForm from './pages/SupervisorForm';

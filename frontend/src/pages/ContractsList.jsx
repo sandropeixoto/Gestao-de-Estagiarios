@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { listContracts } from '../services/api';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
+import PageHeader from '../components/ui/PageHeader';
+import Button from '../components/ui/Button';
 
 const ContractsList = () => {
     const [contracts, setContracts] = useState([]);
@@ -12,12 +14,17 @@ const ContractsList = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">Contratos de Estágio</h2>
-                <Link to="/contract/new" className="bg-primary text-white px-4 py-2 rounded-lg flex items-center hover:bg-primary/90 transition-colors">
-                    <Plus className="w-5 h-5 mr-2" /> Novo Contrato
-                </Link>
-            </div>
+            <PageHeader
+                title="Contratos de Estágio"
+                action={
+                    <Link to="/contract/new">
+                        <Button>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Novo Contrato
+                        </Button>
+                    </Link>
+                }
+            />
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">

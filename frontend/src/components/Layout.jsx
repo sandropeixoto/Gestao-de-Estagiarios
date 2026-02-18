@@ -12,6 +12,7 @@ import {
 
 const Layout = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -40,14 +41,36 @@ const Layout = ({ children }) => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                    }`}
+                className={`fixed inset-y-0 left-0 z-30 bg-white border-r border-gray-200 transform transition-all duration-300 ease-in-out 
+                    lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+                    ${isCollapsed ? 'lg:w-20' : 'lg:w-64'} w-64`}
             >
-                <div className="flex items-center justify-center h-16 border-b border-gray-100">
-                    <h1 className="text-xl font-bold text-primary">Estágio<span className="text-secondary">Plus</span></h1>
+                <div className={`flex items-center h-16 border-b border-gray-100 ${isCollapsed ? 'justify-center' : 'justify-between px-6'}`}>
+                    {!isCollapsed && (
+                        <h1 className="text-xl font-bold text-primary truncate">
+                            Estágio<span className="text-secondary">Plus</span>
+                        </h1>
+                    )}
+                    {isCollapsed && (
+                        <span className="text-xl font-bold text-primary">E<span className="text-secondary">+</span></span>
+                    )}
+
+                    {/* Desktop Collapse Toggle */}
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="p-1 rounded-md text-gray-400 hover:text-primary hover:bg-gray-100 hidden lg:block transition-colors"
+                    >
+                        {isCollapsed ? <Menu className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                    </button>
+                    <button
+                        onClick={() => setSidebarOpen(false)}
+                        className="lg:hidden text-gray-500 focus:outline-none"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
                 </div>
 
-                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto overflow-x-hidden">
                     {menuItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = location.pathname === item.path;
@@ -56,13 +79,15 @@ const Layout = ({ children }) => {
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 group ${isActive
+                                title={isCollapsed ? item.label : ''}
+                                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 group relative
+                                    ${isActive
                                         ? 'bg-primary text-white shadow-md shadow-primary/30'
                                         : 'text-gray-600 hover:bg-gray-50 hover:text-primary'
-                                    }`}
+                                    } ${isCollapsed ? 'justify-center' : ''}`}
                             >
-                                <Icon className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary'}`} />
-                                {item.label}
+                                <Icon className={`w-5 h-5 transition-colors flex-shrink-0 ${!isCollapsed ? 'mr-3' : ''} ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary'}`} />
+                                {!isCollapsed && <span className="truncate">{item.label}</span>}
                             </Link>
                         );
                     })}
@@ -71,16 +96,17 @@ const Layout = ({ children }) => {
                 <div className="p-4 border-t border-gray-100">
                     <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors"
+                        title={isCollapsed ? 'Sair' : ''}
+                        className={`flex items-center w-full px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors ${isCollapsed ? 'justify-center' : ''}`}
                     >
-                        <LogOut className="w-5 h-5 mr-3" />
-                        Sair
+                        <LogOut className={`w-5 h-5 flex-shrink-0 ${!isCollapsed ? 'mr-3' : ''}`} />
+                        {!isCollapsed && <span>Sair</span>}
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <div className="flex flex-col flex-1 overflow-hidden">
+            <div className="flex flex-col flex-1 overflow-hidden transition-all duration-300">
                 {/* Header */}
                 <header className="flex items-center justify-between h-16 px-6 bg-white border-b border-gray-100 lg:px-8">
                     <button

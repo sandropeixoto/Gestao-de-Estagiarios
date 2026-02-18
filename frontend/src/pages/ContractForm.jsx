@@ -1,19 +1,21 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Layout from '../components/Layout';
+import PageHeader from '../components/ui/PageHeader';
+import Input from '../components/ui/Input';
+import Select from '../components/ui/Select';
+import Button from '../components/ui/Button';
 import { createContract, listStudents, listInstitutions, listSupervisors } from '../services/api';
 
 const ContractForm = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
+    const [loadingDeps, setLoadingDeps] = useState(true);
+
+    // Dependencies
     const [students, setStudents] = useState([]);
     const [institutions, setInstitutions] = useState([]);
     const [supervisors, setSupervisors] = useState([]);
-
-    // Load lists for dropdowns
-    useEffect(() => {
-        listStudents().then(res => setStudents(res.data));
-        listInstitutions().then(res => setInstitutions(res.data));
-        listSupervisors().then(res => setSupervisors(res.data));
-    }, []);
 
     const [formData, setFormData] = useState({
         student_id: '',
@@ -23,85 +25,177 @@ const ContractForm = () => {
         data_fim: '',
         valor_bolsa: '',
         valor_transporte: '',
-        apolice_seguro: ''
+        apolice_seguro: '',
+        status: 'Ativo'
     });
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchDependencies = async () => {
+            try {
+                const [studentsRes, institutionsRes, supervisorsRes] = await Promise.all([
+                    listStudents(),
+                    listInstitutions(),
+                    listSupervisors()
+                ]);
+                setStudents(studentsRes.data);
+                setInstitutions(institutionsRes.data);
+                setSupervisors(supervisorsRes.data);
+            } catch (err) {
+                console.error("Failed to load dependencies", err);
+                setError('Erro ao carregar listas de estudantes, empresas ou supervisores.');
+            } finally {
+                setLoadingDeps(false);
+            }
+        };
+
+        fetchDependencies();
+    }, []);
+
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({ ...prev, [id]: value }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+        setError('');
+
         try {
             await createContract(formData);
-            alert('Contrato cadastrado com sucesso!');
-            navigate('/manager-dashboard');
-        } catch (error) {
-            console.error(error);
-            alert('Erro ao cadastrar contrato. Verifique o limite de 2 anos ou se o supervisor já possui 10 estagiários.');
+            navigate('/contracts');
+        } catch (err) {
+            console.error(err);
+            setError('Erro ao criar contrato. Verifique os dados e tente novamente.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
+    if (loadingDeps) {
+        return (
+            <Layout>
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+            </Layout>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-            <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-lg">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">Novo Contrato</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Estudante</label>
-                        <select required className="w-full border p-2 rounded" onChange={e => setFormData({ ...formData, student_id: e.target.value })}>
-                            <option value="">Selecione...</option>
-                            {students.map(s => <option key={s.id} value={s.id}>{s.nome} ({s.cpf})</option>)}
-                        </select>
+        <Layout>
+            <PageHeader
+                title="Novo Contrato"
+                backUrl="/contracts"
+            />
+
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 max-w-3xl mx-auto">
+                {error && (
+                    <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-lg text-sm">
+                        {error}
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Instituição</label>
-                        <select required className="w-full border p-2 rounded" onChange={e => setFormData({ ...formData, institution_id: e.target.value })}>
-                            <option value="">Selecione...</option>
-                            {institutions.map(i => <option key={i.id} value={i.id}>{i.razao_social}</option>)}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Supervisor</label>
-                        <select required className="w-full border p-2 rounded" onChange={e => setFormData({ ...formData, supervisor_id: e.target.value })}>
-                            <option value="">Selecione...</option>
-                            {supervisors.map(s => <option key={s.id} value={s.id}>{s.nome} ({s.area})</option>)}
-                        </select>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Select
+                            id="student_id"
+                            label="Estudante *"
+                            value={formData.student_id}
+                            onChange={handleChange}
+                            required
+                            options={students.map(s => ({ value: s.id, label: s.nome }))}
+                        />
+                        <Select
+                            id="institution_id"
+                            label="Empresa *"
+                            value={formData.institution_id}
+                            onChange={handleChange}
+                            required
+                            options={institutions.map(i => ({ value: i.id, label: i.razao_social }))}
+                        />
                     </div>
 
-                    <div className="flex gap-4">
-                        <div className="w-1/2">
-                            <label className="block text-sm font-medium text-gray-700">Início</label>
-                            <input type="date" required className="w-full border p-2 rounded"
-                                onChange={e => setFormData({ ...formData, data_inicio: e.target.value })} />
-                        </div>
-                        <div className="w-1/2">
-                            <label className="block text-sm font-medium text-gray-700">Fim</label>
-                            <input type="date" required className="w-full border p-2 rounded"
-                                onChange={e => setFormData({ ...formData, data_fim: e.target.value })} />
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Select
+                            id="supervisor_id"
+                            label="Supervisor *"
+                            value={formData.supervisor_id}
+                            onChange={handleChange}
+                            required
+                            options={supervisors.map(s => ({ value: s.id, label: s.nome }))}
+                        />
+                        <Select
+                            id="status"
+                            label="Status do Contrato"
+                            value={formData.status}
+                            onChange={handleChange}
+                            options={[
+                                { value: 'Ativo', label: 'Ativo' },
+                                { value: 'Encerrado', label: 'Encerrado' }
+                            ]}
+                        />
                     </div>
 
-                    <div className="flex gap-4">
-                        <div className="w-1/2">
-                            <label className="block text-sm font-medium text-gray-700">Bolsa (R$)</label>
-                            <input type="number" step="0.01" className="w-full border p-2 rounded"
-                                onChange={e => setFormData({ ...formData, valor_bolsa: e.target.value })} />
-                        </div>
-                        <div className="w-1/2">
-                            <label className="block text-sm font-medium text-gray-700">Transporte (R$)</label>
-                            <input type="number" step="0.01" className="w-full border p-2 rounded"
-                                onChange={e => setFormData({ ...formData, valor_transporte: e.target.value })} />
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Input
+                            id="data_inicio"
+                            label="Data Início *"
+                            type="date"
+                            value={formData.data_inicio}
+                            onChange={handleChange}
+                            required
+                        />
+                        <Input
+                            id="data_fim"
+                            label="Data Fim *"
+                            type="date"
+                            value={formData.data_fim}
+                            onChange={handleChange}
+                            required
+                        />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Apólice Seguro</label>
-                        <input type="text" className="w-full border p-2 rounded"
-                            onChange={e => setFormData({ ...formData, apolice_seguro: e.target.value })} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Input
+                            id="valor_bolsa"
+                            label="Valor Bolsa (R$)"
+                            type="number" step="0.01"
+                            value={formData.valor_bolsa}
+                            onChange={handleChange}
+                            placeholder="0.00"
+                        />
+                        <Input
+                            id="valor_transporte"
+                            label="Valor Transporte (R$)"
+                            type="number" step="0.01"
+                            value={formData.valor_transporte}
+                            onChange={handleChange}
+                            placeholder="0.00"
+                        />
                     </div>
 
-                    <button type="submit" className="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">Salvar Contrato</button>
-                    <button type="button" onClick={() => navigate('/manager-dashboard')} className="w-full bg-gray-200 text-gray-700 p-2 rounded hover:bg-gray-300">Cancelar</button>
+                    <Input
+                        id="apolice_seguro"
+                        label="Apólice de Seguro"
+                        value={formData.apolice_seguro}
+                        onChange={handleChange}
+                        placeholder="Número da apólice e Seguradora"
+                    />
+
+                    <div className="flex justify-end mt-6">
+                        <Button type="button" variant="secondary" className="mr-3" onClick={() => navigate('/contracts')}>
+                            Cancelar
+                        </Button>
+                        <Button type="submit" isLoading={isLoading}>
+                            Criar Contrato
+                        </Button>
+                    </div>
                 </form>
             </div>
-        </div>
+        </Layout>
     );
 };
+
 export default ContractForm;

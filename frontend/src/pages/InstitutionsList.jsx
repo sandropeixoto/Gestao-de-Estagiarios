@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { listInstitutions } from '../services/api';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
+import PageHeader from '../components/ui/PageHeader';
+import Button from '../components/ui/Button';
 
 const InstitutionsList = () => {
     const [institutions, setInstitutions] = useState([]);
@@ -12,12 +14,17 @@ const InstitutionsList = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">Instituições de Ensino</h2>
-                <Link to="/institution/new" className="bg-primary text-white px-4 py-2 rounded-lg flex items-center hover:bg-primary/90 transition-colors">
-                    <Plus className="w-5 h-5 mr-2" /> Nova IES
-                </Link>
-            </div>
+            <PageHeader
+                title="Instituições de Ensino"
+                action={
+                    <Link to="/institution/new">
+                        <Button>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Nova IES
+                        </Button>
+                    </Link>
+                }
+            />
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
