@@ -1,7 +1,7 @@
 <?php
-include_once '../config/database.php';
-include_once '../models/Contract.php';
-include_once '../models/Evaluation.php';
+include_once __DIR__ . '/../config/database.php';
+include_once __DIR__ . '/../models/Contract.php';
+include_once __DIR__ . '/../models/Evaluation.php';
 
 class DashboardController
 {
@@ -19,25 +19,49 @@ class DashboardController
 
     public function getManagerStats()
     {
-        $expiring = $this->contract->getExpiringContracts();
+        try {
+            error_log("Dashboard: Starting...");
 
-        // Enrich expiring with student names
-        // Note: getExpiringContracts currently returns raw rows. Ideally should join with students.
-        // Let's update getExpiringContracts logic in Contract.php or do a quick loop here if strict PDO usage.
-        // Better: Update Contract.php to join with students. I'll stick to a simple fix here or assume Contract.php does it?
-        // Actually, looking at previous Contract.php, it did "SELECT *". I should probably update it to join.
-        // For now, let's just return what we have, frontend expects "student_name".
+            $expiring = $this->contract->getExpiringContracts();
+            error_log("Dashboard: Expiring contracts fetched. Count: " . count($expiring));
 
-        // Update: Let's refactor Contract.php to include student name in expiring check, 
-        // OR better yet, let's just make DashboardController do the query directly if models are too simple. 
-        // But adhering to MVC, let's update Contract model.
+            $pending = $this->evaluation->getPendingEvaluations();
+            error_log("Dashboard: Pending evaluations fetched. Count: " . count($pending));
 
-        $pending = $this->evaluation->getPendingEvaluations();
+            // New Stats for Pro Dashboard
+            // 1. Total Students
+            $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM students");
+            $stmt->execute();
+            $totalStudents = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            error_log("Dashboard: Total students: " . $totalStudents);
 
-        echo json_encode(array(
-            "expiringContracts" => $expiring,
-            "evaluationsPending" => $pending
-        ));
-    }
-}
-?>
+            // 2. Active Contracts
+            $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM contracts WHERE status = 'Ativo'");
+            $stmt->execute();
+            $activeContracts = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            error_log("Dashboard: Active contracts: " . $activeContracts);
+
+            // 3. Contracts per Month
+            $stmt = $this->db->prepare("
+                SELECT to_char(created_at, 'Mon') as name, COUNT(*) as contratos 
+                FROM contracts 
+                WHERE created_at > NOW() - INTERVAL '6 months' 
+                GROUP BY to_char(created_at, 'Mon'), date_trunc('month', created_at)
+                ORDER BY date_trunc('month', created_at)
+            ");
+            $stmt->execute();
+            $contractsChart = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log("Dashboard: Contracts chart data fetched.");
+
+            // 4. Students per Course
+            $stmt = $this->db->prepare("SELECT curso as name, COUNT(*) as value FROM students GROUP BY curso");
+            $stmt->execute();
+            $coursesChart = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log("Dashboard: Courses chart data fetched.");
+
+            $response = array(
+                "expiringContracts" => $expiring,
+                "evaluationsPending" => $pending,
+                "kpi" => [
+                    "totalStudents" => $totalStudents,
+  

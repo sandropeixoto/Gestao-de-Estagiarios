@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 import InternDashboard from './pages/InternDashboard';
-import ManagerDashboard from './pages/ManagerDashboard';
 import Login from './pages/Login';
 import FinancialModule from './pages/FinancialModule';
+
+// New Components
+import Layout from './components/Layout';
+import DashboardOverview from './pages/DashboardOverview';
+import StudentsList from './pages/StudentsList';
+import InstitutionsList from './pages/InstitutionsList';
+import SupervisorsList from './pages/SupervisorsList';
+import ContractsList from './pages/ContractsList';
+
 import StudentForm from './pages/StudentForm';
 import InstitutionForm from './pages/InstitutionForm';
 import SupervisorForm from './pages/SupervisorForm';
@@ -23,23 +31,29 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 font-sans text-gray-900 flex flex-col">
-        <div className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/intern" element={<InternDashboard />} />
-            <Route path="/manager" element={<ManagerDashboard />} />
-            <Route path="/financial" element={<FinancialModule />} />
-            <Route path="/student/new" element={<StudentForm />} />
-            <Route path="/institution/new" element={<InstitutionForm />} />
-            <Route path="/supervisor/new" element={<SupervisorForm />} />
-            <Route path="/contract/new" element={<ContractForm />} />
-          </Routes>
-        </div>
-        <footer className={`p-2 text-center text-xs font-mono text-white ${dbStatus.status === 'online' ? 'bg-green-600' : 'bg-red-600'}`}>
-          DB Status: {dbStatus.status ? dbStatus.status.toUpperCase() : 'OFFLINE'} - {dbStatus.message}
-        </footer>
-      </div>
+      <Routes>
+        <Route path="/" element={<Login />} />
+
+        {/* Intern Route - Keep as is for now */}
+        <Route path="/intern" element={<InternDashboard />} />
+
+        {/* Manager Routes - Wrapped in Layout */}
+        <Route path="/dashboard" element={<Layout><DashboardOverview /></Layout>} />
+        <Route path="/students" element={<Layout><StudentsList /></Layout>} />
+        <Route path="/institutions" element={<Layout><InstitutionsList /></Layout>} />
+        <Route path="/supervisors" element={<Layout><SupervisorsList /></Layout>} />
+        <Route path="/contracts" element={<Layout><ContractsList /></Layout>} />
+
+        {/* Forms - Wrapped in Layout for consistency */}
+        <Route path="/student/new" element={<Layout><StudentForm /></Layout>} />
+        <Route path="/institution/new" element={<Layout><InstitutionForm /></Layout>} />
+        <Route path="/supervisor/new" element={<Layout><SupervisorForm /></Layout>} />
+        <Route path="/contract/new" element={<Layout><ContractForm /></Layout>} />
+        <Route path="/financial" element={<Layout><FinancialModule /></Layout>} />
+
+        {/* Redirect legacy /manager to /dashboard */}
+        <Route path="/manager" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
     </Router>
   )
 }

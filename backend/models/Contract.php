@@ -60,7 +60,7 @@ class Contract
         $query = "SELECT c.*, s.nome as student_name 
                   FROM " . $this->table_name . " c
                   JOIN students s ON c.student_id = s.id
-                  WHERE DATEDIFF(c.data_fim, CURDATE()) <= 30 AND c.status = 'Ativo'";
+                  WHERE (c.data_fim - CURRENT_DATE) <= 30 AND c.status = 'Ativo'";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
