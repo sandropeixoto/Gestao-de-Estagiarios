@@ -42,7 +42,7 @@ const Layout = ({ children }) => {
             {/* Sidebar */}
             <aside
                 className={`fixed inset-y-0 left-0 z-30 bg-white border-r border-gray-200 transform transition-all duration-300 ease-in-out 
-                    lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+                    lg:static lg:inset-0 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
                     ${isCollapsed ? 'lg:w-20' : 'lg:w-64'} w-64`}
             >
                 <div className={`flex items-center h-16 border-b border-gray-100 ${isCollapsed ? 'justify-center' : 'justify-between px-6'}`}>
