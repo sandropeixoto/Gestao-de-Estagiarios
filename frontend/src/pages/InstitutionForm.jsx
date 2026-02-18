@@ -40,7 +40,7 @@ const InstitutionForm = () => {
     };
 
     return (
-        <Layout>
+        <>
             <PageHeader
                 title="Nova Empresa"
                 backUrl="/institutions"
@@ -102,7 +102,7 @@ const InstitutionForm = () => {
                     </div>
                 </form>
             </div>
-        </Layout>
+        </>
     );
 };
 

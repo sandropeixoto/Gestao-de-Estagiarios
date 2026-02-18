@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
 import PageHeader from '../components/ui/PageHeader';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
@@ -48,7 +47,7 @@ const StudentForm = () => {
     };
 
     return (
-        <Layout>
+        <>
             <PageHeader
                 title="Novo Estudante"
                 backUrl="/students"
@@ -125,7 +124,7 @@ const StudentForm = () => {
                     </div>
                 </form>
             </div>
-        </Layout>
+        </>
     );
 };
 

@@ -38,7 +38,7 @@ const SupervisorForm = () => {
     };
 
     return (
-        <Layout>
+        <>
             <PageHeader
                 title="Novo Supervisor"
                 backUrl="/supervisors"
@@ -88,7 +88,7 @@ const SupervisorForm = () => {
                     </div>
                 </form>
             </div>
-        </Layout>
+        </>
     );
 };
 
