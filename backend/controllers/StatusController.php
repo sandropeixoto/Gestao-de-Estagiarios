@@ -1,5 +1,6 @@
 <?php
-include_once '../config/database.php';
+// Use __DIR__ para garantir que o PHP encontre o arquivo independente de onde for chamado
+include_once __DIR__ . '/../config/database.php';
 
 class StatusController
 {

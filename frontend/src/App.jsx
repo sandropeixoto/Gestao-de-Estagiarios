@@ -24,7 +24,7 @@ function App() {
 
   useEffect(() => {
     // Check DB status on load
-    axios.get('http://localhost:8000/status')
+    axios.get('/api/status')
       .then(res => setDbStatus(res.data))
       .catch(err => setDbStatus({ status: 'offline', message: 'Connection Failed' }));
   }, []);

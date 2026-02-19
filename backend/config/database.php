@@ -11,11 +11,12 @@ class Database
 
     public function __construct()
     {
-        $this->host = getenv('DB_HOST') ?: "db.vpwjcgxtgpzicvgmatll.supabase.co";
+        // Supvisior Transaction Pooler (IPv4) - SA East 1 (Brazil)
+        $this->host = getenv('DB_HOST') ?: "aws-0-sa-east-1.pooler.supabase.com";
         $this->db_name = getenv('DB_NAME') ?: "postgres";
-        $this->username = getenv('DB_USER') ?: "postgres";
+        $this->username = getenv('DB_USER') ?: "postgres.vpwjcgxtgpzicvgmatll"; // Pooler username format often requires project ref
         $this->password = getenv('DB_PASS') ?: "FLpEMiCSTw88gRD2";
-        $this->port = getenv('DB_PORT') ?: "5432";
+        $this->port = getenv('DB_PORT') ?: "6543";
     }
     public $conn;
     public $debug = true;
@@ -24,7 +25,7 @@ class Database
     {
         $this->conn = null;
         try {
-            $dsn = "pgsql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name;
+            $dsn = "pgsql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name . ";sslmode=require";
             $this->conn = new PDO($dsn, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
