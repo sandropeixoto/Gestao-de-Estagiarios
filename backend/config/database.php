@@ -29,12 +29,13 @@ class Database
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch (PDOException $exception) {
-            if ($this->debug) {
-                echo "Connection error: " . $exception->getMessage();
-            }
-            else {
-                echo "Connection error.";
-            }
+            // Log error internally if needed, but return clean JSON response
+            http_response_code(503); // Service Unavailable
+            echo json_encode([
+                "message" => "Database connection error.",
+                "details" => $this->debug ? $exception->getMessage() : "Check server logs."
+            ]);
+            exit(); // Stop execution
         }
         return $this->conn;
     }
