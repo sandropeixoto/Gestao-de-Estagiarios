@@ -25,7 +25,7 @@ export const createStudent = async (req: Request, res: Response) => {
                     cpf,
                     curso,
                     semestre,
-                    semestre,
+
                     previsao_formatura: previsao_formatura && previsao_formatura.length === 7 ? `${previsao_formatura}-01` : previsao_formatura,
                     dados_bancarios,
                     comprovante_matricula_path,
