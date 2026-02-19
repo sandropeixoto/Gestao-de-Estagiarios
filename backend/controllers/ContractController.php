@@ -1,6 +1,6 @@
-<?php
-include_once '../config/database.php';
-include_once '../models/Contract.php';
+// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
+include_once __DIR__ . '/../config/database.php';
+include_once __DIR__ . '/../models/Contract.php';
 include_once '../models/Supervisor.php';
 
 class ContractController

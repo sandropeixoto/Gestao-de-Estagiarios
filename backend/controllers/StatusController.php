@@ -1,5 +1,5 @@
 <?php
-// Use __DIR__ para garantir que o PHP encontre o arquivo independente de onde for chamado
+// Use __DIR__ para garantir que o PHP encontre o arquivo independente de onde for chamado// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
 include_once __DIR__ . '/../config/database.php';
 
 class StatusController

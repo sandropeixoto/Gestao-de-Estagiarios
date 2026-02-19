@@ -1,4 +1,5 @@
 <?php
+// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
 include_once __DIR__ . '/../config/database.php';
 include_once __DIR__ . '/../models/Contract.php';
 include_once __DIR__ . '/../models/Evaluation.php';
@@ -59,9 +60,22 @@ class DashboardController
             $coursesChart = $stmt->fetchAll(PDO::FETCH_ASSOC);
             error_log("Dashboard: Courses chart data fetched.");
 
-            $response = array(
-                "expiringContracts" => $expiring,
-                "evaluationsPending" => $pending,
+            $response = [
+                "expiringContracts" => $expiring ?? [],
+                "evaluationsPending" => $pending ?? [],
                 "kpi" => [
-                    "totalStudents" => $totalStudents,
-  
+                    "totalStudents" => $totalStudents ?? 0,
+                    "activeContracts" => $activeContracts ?? 0,
+                    "contractsChart" => $contractsChart ?? [],
+                    "coursesChart" => $coursesChart ?? []
+                ]
+            ];
+
+            echo json_encode($response);
+        }
+        catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["message" => "Error generating dashboard.", "error" => $e->getMessage()]);
+        }
+    }
+}
