@@ -11,6 +11,7 @@ import timesheetRoutes from './routes/timesheetRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import statusRoutes from './routes/statusRoutes';
 import path from 'path';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -25,22 +26,27 @@ app.use(express.json());
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Routes
-app.use('/student', studentRoutes);
-app.use('/supervisor', supervisorRoutes);
-app.use('/contract', contractRoutes);
-app.use('/institution', institutionRoutes);
-app.use('/timesheet', timesheetRoutes);
-app.use('/dashboard', dashboardRoutes);
-app.use('/status', statusRoutes);
+// API Routes Namespace
+const apiRouter = express.Router();
+apiRouter.use('/student', studentRoutes);
+apiRouter.use('/supervisor', supervisorRoutes);
+apiRouter.use('/contract', contractRoutes);
+apiRouter.use('/institution', institutionRoutes);
+apiRouter.use('/timesheet', timesheetRoutes);
+apiRouter.use('/dashboard', dashboardRoutes);
+apiRouter.use('/status', statusRoutes);
+
+app.use('/api', apiRouter);
 
 // Fallback for SPA routing (Express 5 compatible)
 app.use((req, res, next) => {
-    if (req.method === 'GET') {
-        res.sendFile(path.join(__dirname, '../public/index.html'));
-    } else {
-        res.status(404).json({ error: 'Not found' });
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+        const indexPath = path.join(__dirname, '../public/index.html');
+        if (fs.existsSync(indexPath)) {
+            return res.sendFile(indexPath);
+        }
     }
+    res.status(404).json({ error: 'Not found' });
 });
 
 app.listen(port, () => {
