@@ -10,6 +10,7 @@ import institutionRoutes from './routes/institutionRoutes';
 import timesheetRoutes from './routes/timesheetRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import statusRoutes from './routes/statusRoutes';
+import path from 'path';
 
 dotenv.config();
 
@@ -21,6 +22,9 @@ app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Routes
 app.use('/student', studentRoutes);
 app.use('/supervisor', supervisorRoutes);
@@ -30,8 +34,9 @@ app.use('/timesheet', timesheetRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/status', statusRoutes);
 
-app.get('/', (req, res) => {
-    res.send('Gestao de Estagiarios API is running');
+// Fallback for SPA routing
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 app.listen(port, () => {
