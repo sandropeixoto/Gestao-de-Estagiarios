@@ -11,3 +11,5 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
+
+console.log("Supabase URL:", process.env.SUPABASE_URL ? "Carregada" : "Faltando");
