@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import PageHeader from '../components/ui/PageHeader';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { createSupervisor } from '../services/api';
+import { createSupervisor, updateSupervisor, listSupervisors } from '../services/api';
 
 const SupervisorForm = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditing = !!id;
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         nome: '',
@@ -15,6 +17,30 @@ const SupervisorForm = () => {
         area: ''
     });
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (isEditing) {
+            setIsLoading(true);
+            listSupervisors()
+                .then(res => {
+                    const supervisor = res.data.find(s => String(s.id) === String(id));
+                    if (supervisor) {
+                        setFormData({
+                            nome: supervisor.nome || '',
+                            cargo: supervisor.cargo || '',
+                            area: supervisor.area || ''
+                        });
+                    } else {
+                        setError('Supervisor não encontrado.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    setError('Erro ao carregar dados do supervisor.');
+                })
+                .finally(() => setIsLoading(false));
+        }
+    }, [id, isEditing]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -27,11 +53,15 @@ const SupervisorForm = () => {
         setError('');
 
         try {
-            await createSupervisor(formData);
+            if (isEditing) {
+                await updateSupervisor(id, formData);
+            } else {
+                await createSupervisor(formData);
+            }
             navigate('/supervisors');
         } catch (err) {
             console.error(err);
-            setError('Erro ao cadastrar supervisor. Verifique os dados e tente novamente.');
+            setError(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} supervisor. Verifique os dados e tente novamente.`);
         } finally {
             setIsLoading(false);
         }
@@ -40,7 +70,7 @@ const SupervisorForm = () => {
     return (
         <>
             <PageHeader
-                title="Novo Supervisor"
+                title={isEditing ? "Editar Supervisor" : "Novo Supervisor"}
                 backUrl="/supervisors"
             />
 
@@ -82,8 +112,8 @@ const SupervisorForm = () => {
                         <Button type="button" variant="secondary" className="mr-3" onClick={() => navigate('/supervisors')}>
                             Cancelar
                         </Button>
-                        <Button type="submit" isLoading={isLoading}>
-                            Salvar Supervisor
+                        <Button type="submit" isLoading={isLoading} disabled={isLoading}>
+                            {isEditing ? "Atualizar Supervisor" : "Salvar Supervisor"}
                         </Button>
                     </div>
                 </form>

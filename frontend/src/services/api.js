@@ -17,6 +17,14 @@ export const listStudents = async () => {
     return api.get('/student/list');
 };
 
+export const updateStudent = async (id, data) => {
+    return api.put(`/student/${id}`, data);
+};
+
+export const deleteStudent = async (id) => {
+    return api.delete(`/student/${id}`);
+};
+
 // Institution
 export const createInstitution = async (data) => {
     return api.post('/institution/create', data);
@@ -24,6 +32,14 @@ export const createInstitution = async (data) => {
 
 export const listInstitutions = async () => {
     return api.get('/institution/list');
+};
+
+export const updateInstitution = async (id, data) => {
+    return api.put(`/institution/${id}`, data);
+};
+
+export const deleteInstitution = async (id) => {
+    return api.delete(`/institution/${id}`);
 };
 
 // Supervisor & Contract
@@ -35,12 +51,28 @@ export const listSupervisors = async () => {
     return api.get('/supervisor/list');
 };
 
+export const updateSupervisor = async (id, data) => {
+    return api.put(`/supervisor/${id}`, data);
+};
+
+export const deleteSupervisor = async (id) => {
+    return api.delete(`/supervisor/${id}`);
+};
+
 export const createContract = async (data) => {
     return api.post('/contract/create', data);
 };
 
 export const listContracts = async () => {
     return api.get('/contract/list');
+};
+
+export const updateContract = async (id, data) => {
+    return api.put(`/contract/${id}`, data);
+};
+
+export const deleteContract = async (id) => {
+    return api.delete(`/contract/${id}`);
 };
 
 // Dashboard

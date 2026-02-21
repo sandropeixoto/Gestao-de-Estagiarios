@@ -36,3 +36,54 @@ export const getActiveInternsCount = async (supervisorId: string | number): Prom
     if (error) throw error;
     return count || 0;
 };
+
+export const updateSupervisor = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ message: 'Supervisor ID is required.' });
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from(TABLE_NAME)
+            .update(req.body)
+            .eq('id', id)
+            .select();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
+            return res.status(404).json({ message: 'Supervisor not found.' });
+        }
+
+        res.status(200).json({ message: 'Supervisor updated successfully.', data: data[0] });
+    } catch (error) {
+        res.status(503).json({ message: 'Unable to update supervisor.', error: (error as Error).message });
+    }
+};
+
+export const deleteSupervisor = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ message: 'Supervisor ID is required.' });
+    }
+
+    try {
+        const { error } = await supabase
+            .from(TABLE_NAME)
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            throw error;
+        }
+
+        res.status(200).json({ message: 'Supervisor deleted successfully.' });
+    } catch (error) {
+        res.status(503).json({ message: 'Unable to delete supervisor.', error: (error as Error).message });
+    }
+};

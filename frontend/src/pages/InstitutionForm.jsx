@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import PageHeader from '../components/ui/PageHeader';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
-import { createInstitution } from '../services/api';
+import { createInstitution, updateInstitution, listInstitutions } from '../services/api';
 
 const InstitutionForm = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditing = !!id;
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         razao_social: '',
@@ -17,6 +19,31 @@ const InstitutionForm = () => {
         status_convenio: 'Ativo'
     });
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (isEditing) {
+            setIsLoading(true);
+            listInstitutions()
+                .then(res => {
+                    const institution = res.data.find(i => String(i.id) === String(id));
+                    if (institution) {
+                        setFormData({
+                            razao_social: institution.razao_social || '',
+                            cnpj: institution.cnpj || '',
+                            coordenador_responsavel: institution.coordenador_responsavel || '',
+                            status_convenio: institution.status_convenio || 'Ativo'
+                        });
+                    } else {
+                        setError('Instituição não encontrada.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    setError('Erro ao carregar dados da instituição.');
+                })
+                .finally(() => setIsLoading(false));
+        }
+    }, [id, isEditing]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -29,11 +56,15 @@ const InstitutionForm = () => {
         setError('');
 
         try {
-            await createInstitution(formData);
+            if (isEditing) {
+                await updateInstitution(id, formData);
+            } else {
+                await createInstitution(formData);
+            }
             navigate('/institutions');
         } catch (err) {
             console.error(err);
-            setError('Erro ao cadastrar empresa. Verifique os dados e tente novamente.');
+            setError(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} empresa. Verifique os dados e tente novamente.`);
         } finally {
             setIsLoading(false);
         }
@@ -42,7 +73,7 @@ const InstitutionForm = () => {
     return (
         <>
             <PageHeader
-                title="Nova Empresa"
+                title={isEditing ? "Editar Empresa" : "Nova Empresa"}
                 backUrl="/institutions"
             />
 
@@ -96,8 +127,8 @@ const InstitutionForm = () => {
                         <Button type="button" variant="secondary" className="mr-3" onClick={() => navigate('/institutions')}>
                             Cancelar
                         </Button>
-                        <Button type="submit" isLoading={isLoading}>
-                            Salvar Empresa
+                        <Button type="submit" isLoading={isLoading} disabled={isLoading}>
+                            {isEditing ? "Atualizar Empresa" : "Salvar Empresa"}
                         </Button>
                     </div>
                 </form>

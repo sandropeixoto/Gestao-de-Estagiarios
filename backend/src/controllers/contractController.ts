@@ -73,3 +73,54 @@ export const checkExpiringContracts = async (req: Request, res: Response) => {
         res.status(503).json({ message: 'Error fetching expiring contracts', error: (error as Error).message });
     }
 };
+
+export const updateContract = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ message: 'Contract ID is required.' });
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from(TABLE_NAME)
+            .update(req.body)
+            .eq('id', id)
+            .select();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || data.length === 0) {
+            return res.status(404).json({ message: 'Contract not found.' });
+        }
+
+        res.status(200).json({ message: 'Contract updated successfully.', data: data[0] });
+    } catch (error) {
+        res.status(503).json({ message: 'Unable to update contract.', error: (error as Error).message });
+    }
+};
+
+export const deleteContract = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ message: 'Contract ID is required.' });
+    }
+
+    try {
+        const { error } = await supabase
+            .from(TABLE_NAME)
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            throw error;
+        }
+
+        res.status(200).json({ message: 'Contract deleted successfully.' });
+    } catch (error) {
+        res.status(503).json({ message: 'Unable to delete contract.', error: (error as Error).message });
+    }
+};

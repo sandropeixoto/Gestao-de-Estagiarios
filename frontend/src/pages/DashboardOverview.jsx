@@ -78,7 +78,7 @@ const DashboardOverview = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">Contratos a Vencer</h3>
-                    {data.expiringContracts?.length === 0 ? (
+                    {(!data.expiringContracts || data.expiringContracts.length === 0) ? (
                         <p className="text-green-600">Tudo certo! Nenhum contrato vencendo.</p>
                     ) : (
                         <ul className="space-y-3">
@@ -93,7 +93,7 @@ const DashboardOverview = () => {
                 </div>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">Avaliações Pendentes</h3>
-                    {data.evaluationsPending?.length === 0 ? (
+                    {(!data.evaluationsPending || data.evaluationsPending.length === 0) ? (
                         <p className="text-green-600">Todas as avaliações em dia.</p>
                     ) : (
                         <ul className="space-y-3">

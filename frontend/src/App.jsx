@@ -46,9 +46,17 @@ function App() {
 
         {/* Forms - Wrapped in Layout for consistency */}
         <Route path="/student/new" element={<Layout><StudentForm /></Layout>} />
+        <Route path="/student/edit/:id" element={<Layout><StudentForm /></Layout>} />
+
         <Route path="/institution/new" element={<Layout><InstitutionForm /></Layout>} />
+        <Route path="/institution/edit/:id" element={<Layout><InstitutionForm /></Layout>} />
+
         <Route path="/supervisor/new" element={<Layout><SupervisorForm /></Layout>} />
+        <Route path="/supervisor/edit/:id" element={<Layout><SupervisorForm /></Layout>} />
+
         <Route path="/contract/new" element={<Layout><ContractForm /></Layout>} />
+        <Route path="/contract/edit/:id" element={<Layout><ContractForm /></Layout>} />
+
         <Route path="/financial" element={<Layout><FinancialModule /></Layout>} />
 
         {/* Redirect legacy /manager to /dashboard */}

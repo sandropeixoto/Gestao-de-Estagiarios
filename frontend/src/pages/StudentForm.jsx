@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { createStudent } from '../services/api';
+import { createStudent, updateStudent, listStudents } from '../services/api';
 
 const StudentForm = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditing = !!id;
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         nome: '',
@@ -15,15 +17,35 @@ const StudentForm = () => {
         semestre: '',
         previsao_formatura: '',
         dados_bancarios: '',
-        // dados_bancarios: {
-        //     banco: '',
-        //     agencia: '',
-        //     conta: '',
-        //     pix: ''
-        // } 
-        // Keeping it simple as text for now as per schema
     });
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (isEditing) {
+            setIsLoading(true);
+            listStudents()
+                .then(res => {
+                    const student = res.data.find(s => String(s.id) === String(id));
+                    if (student) {
+                        setFormData({
+                            nome: student.nome || '',
+                            cpf: student.cpf || '',
+                            curso: student.curso || '',
+                            semestre: student.semestre || '',
+                            previsao_formatura: student.previsao_formatura || '',
+                            dados_bancarios: student.dados_bancarios || '',
+                        });
+                    } else {
+                        setError('Estudante não encontrado.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    setError('Erro ao carregar dados do estudante.');
+                })
+                .finally(() => setIsLoading(false));
+        }
+    }, [id, isEditing]);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -36,11 +58,15 @@ const StudentForm = () => {
         setError('');
 
         try {
-            await createStudent(formData);
+            if (isEditing) {
+                await updateStudent(id, formData);
+            } else {
+                await createStudent(formData);
+            }
             navigate('/students');
         } catch (err) {
             console.error(err);
-            setError('Erro ao cadastrar estudante. Verifique os dados e tente novamente.');
+            setError(`Erro ao ${isEditing ? 'atualizar' : 'cadastrar'} estudante. Verifique os dados e tente novamente.`);
         } finally {
             setIsLoading(false);
         }
@@ -49,7 +75,7 @@ const StudentForm = () => {
     return (
         <>
             <PageHeader
-                title="Novo Estudante"
+                title={isEditing ? "Editar Estudante" : "Novo Estudante"}
                 backUrl="/students"
             />
 
@@ -118,8 +144,8 @@ const StudentForm = () => {
                         <Button type="button" variant="secondary" className="mr-3" onClick={() => navigate('/students')}>
                             Cancelar
                         </Button>
-                        <Button type="submit" isLoading={isLoading}>
-                            Salvar Estudante
+                        <Button type="submit" isLoading={isLoading} disabled={isLoading}>
+                            {isEditing ? "Atualizar Estudante" : "Salvar Estudante"}
                         </Button>
                     </div>
                 </form>

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import PageHeader from '../components/ui/PageHeader';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
-import { createContract, listStudents, listInstitutions, listSupervisors } from '../services/api';
+import { createContract, updateContract, listContracts, listStudents, listInstitutions, listSupervisors } from '../services/api';
 
 const ContractForm = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditing = !!id;
     const [isLoading, setIsLoading] = useState(false);
     const [loadingDeps, setLoadingDeps] = useState(true);
 
@@ -33,17 +35,38 @@ const ContractForm = () => {
     useEffect(() => {
         const fetchDependencies = async () => {
             try {
-                const [studentsRes, institutionsRes, supervisorsRes] = await Promise.all([
+                const [studentsRes, institutionsRes, supervisorsRes, contractsRes] = await Promise.all([
                     listStudents(),
                     listInstitutions(),
-                    listSupervisors()
+                    listSupervisors(),
+                    isEditing ? listContracts() : Promise.resolve({ data: [] })
                 ]);
                 setStudents(studentsRes.data);
                 setInstitutions(institutionsRes.data);
                 setSupervisors(supervisorsRes.data);
+
+                if (isEditing) {
+                    const contract = contractsRes.data.find(c => String(c.id) === String(id));
+                    if (contract) {
+                        setFormData({
+                            student_id: contract.student_id || '',
+                            institution_id: contract.institution_id || '',
+                            supervisor_id: contract.supervisor_id || '',
+                            data_inicio: contract.data_inicio || '',
+                            data_fim: contract.data_fim || '',
+                            valor_bolsa: contract.valor_bolsa || '',
+                            valor_transporte: contract.valor_transporte || '',
+                            apolice_seguro: contract.apolice_seguro || '',
+                            status: contract.status || 'Ativo'
+                        });
+                    } else {
+                        setError('Contrato não encontrado.');
+                    }
+                }
+
             } catch (err) {
                 console.error("Failed to load dependencies", err);
-                setError('Erro ao carregar listas de estudantes, empresas ou supervisores.');
+                setError('Erro ao carregar dados necessários.');
             } finally {
                 setLoadingDeps(false);
             }
@@ -63,11 +86,15 @@ const ContractForm = () => {
         setError('');
 
         try {
-            await createContract(formData);
+            if (isEditing) {
+                await updateContract(id, formData);
+            } else {
+                await createContract(formData);
+            }
             navigate('/contracts');
         } catch (err) {
             console.error(err);
-            setError('Erro ao criar contrato. Verifique os dados e tente novamente.');
+            setError(`Erro ao ${isEditing ? 'atualizar' : 'criar'} contrato. Verifique os dados e tente novamente.`);
         } finally {
             setIsLoading(false);
         }
@@ -84,7 +111,7 @@ const ContractForm = () => {
     return (
         <>
             <PageHeader
-                title="Novo Contrato"
+                title={isEditing ? "Editar Contrato" : "Novo Contrato"}
                 backUrl="/contracts"
             />
 
@@ -186,8 +213,8 @@ const ContractForm = () => {
                         <Button type="button" variant="secondary" className="mr-3" onClick={() => navigate('/contracts')}>
                             Cancelar
                         </Button>
-                        <Button type="submit" isLoading={isLoading}>
-                            Criar Contrato
+                        <Button type="submit" isLoading={isLoading} disabled={isLoading}>
+                            {isEditing ? "Atualizar Contrato" : "Criar Contrato"}
                         </Button>
                     </div>
                 </form>
