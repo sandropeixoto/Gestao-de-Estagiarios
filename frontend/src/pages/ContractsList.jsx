@@ -48,20 +48,31 @@ const ContractsList = () => {
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Estudante</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Instituição</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Unidade / Subunidade</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Vigência</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
+                            <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Status</th>
                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Ações</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {contracts.map(c => (
                             <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{c.student_name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{c.institution_name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{c.data_inicio} - {c.data_fim}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${c.status === 'Ativo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                    <div className="text-sm font-bold text-brandText">{c.students?.nome || 'Não informado'}</div>
+                                    <div className="text-[10px] text-muted uppercase tracking-wider">{c.institutions?.razao_social}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="text-xs font-bold text-primary">{c.positions?.lotacoes?.unidade}</div>
+                                    <div className="text-[10px] text-gray-400">{c.positions?.lotacoes?.subunidade}</div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600 font-medium">
+                                    {c.data_inicio ? new Date(c.data_inicio).toLocaleDateString('pt-BR') : '-'} até <br/>
+                                    {c.data_fim ? new Date(c.data_fim).toLocaleDateString('pt-BR') : '-'}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-center">
+                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                                        c.status === 'Ativo' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
+                                    }`}>
                                         {c.status}
                                     </span>
                                 </td>

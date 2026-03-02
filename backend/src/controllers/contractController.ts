@@ -111,6 +111,7 @@ export const createContract = async (req: Request, res: Response) => {
 };
 
 export const getAllContracts = async (req: Request, res: Response) => {
+    console.log('🔍 [DEBUG] Buscando listagem de contratos...');
     try {
         const { data, error } = await supabase
             .from(TABLE_NAME)
@@ -128,7 +129,12 @@ export const getAllContracts = async (req: Request, res: Response) => {
                 )
             `);
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ [DEBUG] Erro Supabase ao listar contratos:', error);
+            throw error;
+        }
+        
+        console.log('✅ [DEBUG] Contratos recuperados:', data?.length || 0);
         res.status(200).json(data);
     } catch (error) {
         console.error('Erro ao buscar contratos:', error);
