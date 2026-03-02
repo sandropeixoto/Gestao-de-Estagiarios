@@ -7,7 +7,11 @@ import { getActiveInternsCount } from './supervisorController';
 
 export const createContract = async (req: Request, res: Response) => {
     try {
-        const { supervisor_id, data_inicio, data_fim, ...rest } = req.body;
+        const { supervisor_id, position_id, data_inicio, data_fim, ...rest } = req.body;
+
+        if (!position_id) {
+            return res.status(400).json({ message: 'ID da vaga é obrigatório.' });
+        }
 
         // Validate Supervisor Limit
         const activeInterns = await getActiveInternsCount(supervisor_id);
@@ -26,16 +30,42 @@ export const createContract = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Contrato não pode exceder 2 anos.' });
         }
 
+        // Check Position Capacity
+        const { data: posData, error: posError } = await supabase
+            .from('positions')
+            .select('quantidade')
+            .eq('id', position_id)
+            .single();
+        
+        if (posError || !posData) throw new Error('Vaga não encontrada.');
+
+        const { count: currentOccupancy } = await supabase
+            .from('contracts')
+            .select('*', { count: 'exact', head: true })
+            .eq('position_id', position_id)
+            .eq('status', 'Ativo');
+
+        if ((currentOccupancy || 0) >= posData.quantidade) {
+            return res.status(400).json({ message: 'Esta vaga já atingiu o limite de ocupação.' });
+        }
+
         const { data, error } = await supabase.from(TABLE_NAME).insert([{
             supervisor_id,
+            position_id,
             data_inicio,
             data_fim,
             status: 'Ativo',
             ...rest
-        }]);
+        }]).select();
 
         if (error) throw error;
-        res.status(201).json({ message: 'Contract created.', data });
+
+        // Se após a inserção a vaga lotou, atualiza o status dela
+        if ((currentOccupancy || 0) + 1 >= posData.quantidade) {
+            await supabase.from('positions').update({ status: 'Ocupada' }).eq('id', position_id);
+        }
+
+        res.status(201).json({ message: 'Contract created.', data: data[0] });
     } catch (error) {
         res.status(503).json({ message: 'Error creating contract', error: (error as Error).message });
     }
@@ -45,7 +75,19 @@ export const getAllContracts = async (req: Request, res: Response) => {
     try {
         const { data, error } = await supabase
             .from(TABLE_NAME)
-            .select('*, students(nome), institutions(razao_social), supervisors(nome)');
+            .select(`
+                *,
+                students (nome),
+                institutions (razao_social),
+                supervisors (nome),
+                positions (
+                    id,
+                    lotacoes (
+                        unidade,
+                        subunidade
+                    )
+                )
+            `);
 
         if (error) throw error;
         res.status(200).json(data);
