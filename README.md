@@ -1,58 +1,44 @@
 # Gestão de Estagiários
 
-Sistema moderno de gestão de estágios desenvolvido para administrar estudantes, instituições (empresas concedentes), supervisores e contratos de estágio.
+Sistema moderno e escalável para a gestão completa do ciclo de vida de estágios, administrando estudantes, instituições concedentes, supervisores e os contratos firmados entre eles.
 
-## Situação Atual do Projeto (Fevereiro/2026)
+## 🚀 Visão Geral
+A plataforma automatiza e centraliza a gestão de estágios. Originalmente construído sobre uma arquitetura legada, o projeto foi modernizado para utilizar o **Supabase** (PostgreSQL) como banco de dados principal, garantindo maior performance, segurança e escalabilidade.
 
-O projeto passou recentemente por uma migração para utilizar o **Supabase** (PostgreSQL) como banco de dados principal e backend as a service, substituindo a infraestrutura legada.
+## 🛠️ Stack Tecnológica
 
-### Funcionalidades Implementadas
+- **Frontend:** React.js, Vite, Tailwind CSS, Lucide React (ícones), Axios.
+- **Backend:** Node.js, Express.js, TypeScript.
+- **Database & Auth:** Supabase (PostgreSQL).
 
-O sistema atualmente conta com operações **CRUD (Create, Read, Update, Delete)** completas para todas as entidades principais:
+## 📦 Instalação e Configuração
 
-*   **🧑‍🎓 Estudantes:**
-    *   Listagem completa.
-    *   Cadastro com validação de dados (Nome, CPF, Curso, Semestre, Previsão de Formatura, Dados Bancários).
-    *   Edição de registros existentes.
-    *   Exclusão com confirmação.
-*   **🏢 Instituições (Empresas):**
-    *   Listagem completa.
-    *   Cadastro de concedentes (Razão Social, CNPJ, Endereço, Contato, Representante Legal).
-    *   Edição de registros existentes.
-    *   Exclusão com confirmação.
-*   **👨‍💼 Supervisores:**
-    *   Listagem completa.
-    *   Cadastro de supervisores de estágio vinculados às áreas e cargos.
-    *   Edição e exclusão de registros.
-*   **📄 Contratos:**
-    *   Listagem completa de contratos de estágio.
-    *   Criação de contratos vinculando Estudante, Instituição e Supervisor.
-    *   Definição de valores de bolsa e transporte, datas de início e fim, vigência e apólice de seguro.
-    *   Edição de status (Ex: Ativo / Encerrado) e demais dados do contrato.
-    *   Exclusão de contratos.
+O projeto é estruturado em dois monorepos lógicos (Frontend e Backend). Siga as etapas abaixo para execução local.
 
-### Stack Tecnológica
-
-*   **Frontend:** React, Vite, Tailwind CSS, Lucide React, Axios.
-*   **Backend:** Node.js, Express, TypeScript.
-*   **Database & Auth:** Supabase (PostgreSQL).
-
-## Como Executar
-
-O projeto é dividido em duas pastas principais: `frontend` e `backend`.
-
-### Backend
-\`\`\`bash
+### 1. Configuração do Backend
+```bash
 cd backend
 npm install
+```
+Certifique-se de configurar o arquivo `.env` na raiz da pasta `backend` com as seguintes variáveis:
+```env
+SUPABASE_URL=sua_url_aqui
+SUPABASE_ANON_KEY=sua_chave_aqui
+PORT=porta_do_servidor
+```
+Para iniciar o servidor:
+```bash
 npm run dev
-\`\`\`
-*(É necessário ter as variáveis de ambiente configuradas no arquivo `.env` contendo as chaves do Supabase e a porta do servidor).*
+```
 
-### Frontend
-\`\`\`bash
+### 2. Configuração do Frontend
+Em um novo terminal:
+```bash
 cd frontend
 npm install
+```
+Para iniciar a interface:
+```bash
 npm run dev
-\`\`\`
-*(A aplicação frontend estará disponível em `http://localhost:5173`)*
+```
+A aplicação estará disponível por padrão em `http://localhost:5173`.
