@@ -38,7 +38,7 @@ export const createStudent = async (req: Request, res: Response) => {
 
         res.status(201).json({ message: 'Student created successfully.', data });
     } catch (error) {
-        res.status(503).json({ message: 'Unable to create student.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to create student.', error: (error as Error).message });
     }
 };
 
@@ -52,7 +52,7 @@ export const getAllStudents = async (req: Request, res: Response) => {
 
         res.status(200).json(data);
     } catch (error) {
-        res.status(503).json({ message: 'Unable to fetch students.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to fetch students.', error: (error as Error).message });
     }
 };
 
@@ -97,7 +97,7 @@ export const updateStudent = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Student updated successfully.', data: data[0] });
     } catch (error) {
-        res.status(503).json({ message: 'Unable to update student.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to update student.', error: (error as Error).message });
     }
 };
 
@@ -120,6 +120,6 @@ export const deleteStudent = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Student deleted successfully.' });
     } catch (error) {
-        res.status(503).json({ message: 'Unable to delete student.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to delete student.', error: (error as Error).message });
     }
 };

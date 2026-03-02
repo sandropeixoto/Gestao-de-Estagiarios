@@ -10,7 +10,7 @@ export const createSupervisor = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(201).json({ message: 'Supervisor created.', data: data[0] });
     } catch (error) {
-        res.status(503).json({ message: 'Error creating supervisor', error: (error as Error).message });
+        res.status(500).json({ message: 'Error creating supervisor', error: (error as Error).message });
     }
 };
 
@@ -31,7 +31,7 @@ export const getAllSupervisors = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(200).json(data);
     } catch (error) {
-        res.status(503).json({ message: 'Error fetching supervisors', error: (error as Error).message });
+        res.status(500).json({ message: 'Error fetching supervisors', error: (error as Error).message });
     }
 };
 
@@ -70,7 +70,7 @@ export const updateSupervisor = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Supervisor updated successfully.', data: data[0] });
     } catch (error) {
-        res.status(503).json({ message: 'Unable to update supervisor.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to update supervisor.', error: (error as Error).message });
     }
 };
 
@@ -93,6 +93,6 @@ export const deleteSupervisor = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Supervisor deleted successfully.' });
     } catch (error) {
-        res.status(503).json({ message: 'Unable to delete supervisor.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to delete supervisor.', error: (error as Error).message });
     }
 };

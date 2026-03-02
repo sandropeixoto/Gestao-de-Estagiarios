@@ -9,7 +9,7 @@ export const createPosition = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(201).json({ message: 'Position created.', data: data[0] });
     } catch (error) {
-        res.status(503).json({ message: 'Error creating position', error: (error as Error).message });
+        res.status(500).json({ message: 'Error creating position', error: (error as Error).message });
     }
 };
 
@@ -44,7 +44,7 @@ export const getAllPositions = async (req: Request, res: Response) => {
 
         res.status(200).json(positionsWithUsage);
     } catch (error) {
-        res.status(503).json({ message: 'Error fetching positions', error: (error as Error).message });
+        res.status(500).json({ message: 'Error fetching positions', error: (error as Error).message });
     }
 };
 
@@ -60,7 +60,7 @@ export const updatePosition = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(200).json({ message: 'Position updated.', data: data[0] });
     } catch (error) {
-        res.status(503).json({ message: 'Error updating position', error: (error as Error).message });
+        res.status(500).json({ message: 'Error updating position', error: (error as Error).message });
     }
 };
 
@@ -71,6 +71,6 @@ export const deletePosition = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(200).json({ message: 'Position deleted.' });
     } catch (error) {
-        res.status(503).json({ message: 'Error deleting position', error: (error as Error).message });
+        res.status(500).json({ message: 'Error deleting position', error: (error as Error).message });
     }
 };

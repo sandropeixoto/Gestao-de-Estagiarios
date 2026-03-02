@@ -7,7 +7,18 @@ import { getActiveInternsCount } from './supervisorController';
 
 export const createContract = async (req: Request, res: Response) => {
     try {
-        const { supervisor_id, position_id, data_inicio, data_fim, ...rest } = req.body;
+        const { 
+            student_id, 
+            institution_id, 
+            supervisor_id, 
+            position_id, 
+            data_inicio, 
+            data_fim, 
+            valor_bolsa, 
+            valor_transporte, 
+            apolice_seguro,
+            status 
+        } = req.body;
 
         if (!position_id) {
             return res.status(400).json({ message: 'ID da vaga é obrigatório.' });
@@ -25,7 +36,6 @@ export const createContract = async (req: Request, res: Response) => {
         const diffTime = Math.abs(end.getTime() - start.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        // Approximate 2 years as 730 days
         if (diffDays > 730) {
             return res.status(400).json({ message: 'Contrato não pode exceder 2 anos.' });
         }
@@ -37,7 +47,10 @@ export const createContract = async (req: Request, res: Response) => {
             .eq('id', position_id)
             .single();
         
-        if (posError || !posData) throw new Error('Vaga não encontrada.');
+        if (posError || !posData) {
+            console.error('Erro ao buscar vaga:', posError);
+            return res.status(400).json({ message: 'Vaga não encontrada.' });
+        }
 
         const { count: currentOccupancy } = await supabase
             .from('contracts')
@@ -50,24 +63,28 @@ export const createContract = async (req: Request, res: Response) => {
         }
 
         const { data, error } = await supabase.from(TABLE_NAME).insert([{
+            student_id,
+            institution_id,
             supervisor_id,
             position_id,
             data_inicio,
             data_fim,
-            status: 'Ativo',
-            ...rest
+            valor_bolsa,
+            valor_transporte,
+            apolice_seguro,
+            status: status || 'Ativo'
         }]).select();
 
         if (error) throw error;
 
-        // Se após a inserção a vaga lotou, atualiza o status dela
         if ((currentOccupancy || 0) + 1 >= posData.quantidade) {
             await supabase.from('positions').update({ status: 'Ocupada' }).eq('id', position_id);
         }
 
         res.status(201).json({ message: 'Contract created.', data: data[0] });
     } catch (error) {
-        res.status(503).json({ message: 'Error creating contract', error: (error as Error).message });
+        console.error('ERRO CRÍTICO NO BACKEND (createContract):', error);
+        res.status(500).json({ message: 'Erro interno ao criar contrato', error: (error as Error).message });
     }
 };
 
@@ -92,7 +109,8 @@ export const getAllContracts = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(200).json(data);
     } catch (error) {
-        res.status(503).json({ message: 'Error fetching contracts', error: (error as Error).message });
+        console.error('Erro ao buscar contratos:', error);
+        res.status(500).json({ message: 'Erro ao buscar contratos', error: (error as Error).message });
     }
 };
 

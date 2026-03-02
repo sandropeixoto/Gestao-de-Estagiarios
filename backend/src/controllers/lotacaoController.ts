@@ -14,7 +14,7 @@ export const getAllLotacoes = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(200).json(data);
     } catch (error) {
-        res.status(503).json({ message: 'Error fetching lotacoes', error: (error as Error).message });
+        res.status(500).json({ message: 'Error fetching lotacoes', error: (error as Error).message });
     }
 };
 
@@ -30,6 +30,6 @@ export const getLotacaoById = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(200).json(data);
     } catch (error) {
-        res.status(503).json({ message: 'Error fetching lotacao', error: (error as Error).message });
+        res.status(500).json({ message: 'Error fetching lotacao', error: (error as Error).message });
     }
 };

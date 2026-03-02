@@ -9,7 +9,7 @@ export const createInstitution = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(201).json({ message: 'Institution created.', data });
     } catch (error) {
-        res.status(503).json({ message: 'Error creating institution', error: (error as Error).message });
+        res.status(500).json({ message: 'Error creating institution', error: (error as Error).message });
     }
 };
 
@@ -19,7 +19,7 @@ export const getAllInstitutions = async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(200).json(data);
     } catch (error) {
-        res.status(503).json({ message: 'Error fetching institutions', error: (error as Error).message });
+        res.status(500).json({ message: 'Error fetching institutions', error: (error as Error).message });
     }
 };
 
@@ -47,7 +47,7 @@ export const updateInstitution = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Institution updated successfully.', data: data[0] });
     } catch (error) {
-        res.status(503).json({ message: 'Unable to update institution.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to update institution.', error: (error as Error).message });
     }
 };
 
@@ -70,6 +70,6 @@ export const deleteInstitution = async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Institution deleted successfully.' });
     } catch (error) {
-        res.status(503).json({ message: 'Unable to delete institution.', error: (error as Error).message });
+        res.status(500).json({ message: 'Unable to delete institution.', error: (error as Error).message });
     }
 };
