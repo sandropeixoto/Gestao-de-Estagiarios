@@ -6,6 +6,7 @@ const TABLE_NAME = 'contracts';
 import { getActiveInternsCount } from './supervisorController';
 
 export const createContract = async (req: Request, res: Response) => {
+    console.log('🚀 [DEBUG] Iniciando criação de contrato. Body recebido:', JSON.stringify(req.body, null, 2));
     try {
         const { 
             student_id, 
@@ -21,26 +22,33 @@ export const createContract = async (req: Request, res: Response) => {
         } = req.body;
 
         if (!position_id) {
+            console.log('❌ [DEBUG] Falha: position_id ausente');
             return res.status(400).json({ message: 'ID da vaga é obrigatório.' });
         }
 
         // Validate Supervisor Limit
+        console.log('🔍 [DEBUG] Verificando limite de estagiários para supervisor:', supervisor_id);
         const activeInterns = await getActiveInternsCount(supervisor_id);
+        console.log('📊 [DEBUG] Estagiários ativos para este supervisor:', activeInterns);
         if (activeInterns >= 10) {
+            console.log('❌ [DEBUG] Falha: Limite de 10 estagiários atingido');
             return res.status(400).json({ message: 'Limite legal de 10 estagiários por supervisor excedido' });
         }
 
-        // Validate Contract Duration (Max 2 years)
+        // Validate Contract Duration
         const start = new Date(data_inicio);
         const end = new Date(data_fim);
         const diffTime = Math.abs(end.getTime() - start.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        console.log('📅 [DEBUG] Duração do contrato calculada (dias):', diffDays);
 
         if (diffDays > 730) {
+            console.log('❌ [DEBUG] Falha: Duração superior a 2 anos');
             return res.status(400).json({ message: 'Contrato não pode exceder 2 anos.' });
         }
 
         // Check Position Capacity
+        console.log('🔍 [DEBUG] Buscando detalhes da vaga:', position_id);
         const { data: posData, error: posError } = await supabase
             .from('positions')
             .select('quantidade')
@@ -48,42 +56,56 @@ export const createContract = async (req: Request, res: Response) => {
             .single();
         
         if (posError || !posData) {
-            console.error('Erro ao buscar vaga:', posError);
-            return res.status(400).json({ message: 'Vaga não encontrada.' });
+            console.error('❌ [DEBUG] Erro ao buscar vaga no Supabase:', posError);
+            return res.status(400).json({ message: 'Vaga não encontrada ou erro no banco.' });
         }
+        console.log('✅ [DEBUG] Vaga encontrada. Capacidade:', posData.quantidade);
 
         const { count: currentOccupancy } = await supabase
             .from('contracts')
             .select('*', { count: 'exact', head: true })
             .eq('position_id', position_id)
             .eq('status', 'Ativo');
+        
+        console.log('👥 [DEBUG] Ocupação atual da vaga:', currentOccupancy);
 
         if ((currentOccupancy || 0) >= posData.quantidade) {
+            console.log('❌ [DEBUG] Falha: Vaga sem slots disponíveis');
             return res.status(400).json({ message: 'Esta vaga já atingiu o limite de ocupação.' });
         }
 
-        const { data, error } = await supabase.from(TABLE_NAME).insert([{
+        // Inserção Final
+        const dataToInsert = {
             student_id,
             institution_id,
             supervisor_id,
             position_id,
             data_inicio,
             data_fim,
-            valor_bolsa,
-            valor_transporte,
+            valor_bolsa: valor_bolsa || 0,
+            valor_transporte: valor_transporte || 0,
             apolice_seguro,
             status: status || 'Ativo'
-        }]).select();
+        };
+        console.log('📝 [DEBUG] Tentando INSERT no Supabase:', JSON.stringify(dataToInsert, null, 2));
 
-        if (error) throw error;
+        const { data, error } = await supabase.from(TABLE_NAME).insert([dataToInsert]).select();
+
+        if (error) {
+            console.error('❌ [DEBUG] Erro retornado pelo Supabase no INSERT:', error);
+            throw error;
+        }
+
+        console.log('🎉 [DEBUG] Contrato criado com sucesso! ID:', data[0].id);
 
         if ((currentOccupancy || 0) + 1 >= posData.quantidade) {
+            console.log('🔄 [DEBUG] Atualizando status da vaga para Ocupada');
             await supabase.from('positions').update({ status: 'Ocupada' }).eq('id', position_id);
         }
 
         res.status(201).json({ message: 'Contract created.', data: data[0] });
     } catch (error) {
-        console.error('ERRO CRÍTICO NO BACKEND (createContract):', error);
+        console.error('💥 [DEBUG] EXCEÇÃO CAPTURADA NO CATCH:', error);
         res.status(500).json({ message: 'Erro interno ao criar contrato', error: (error as Error).message });
     }
 };
