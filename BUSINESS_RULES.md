@@ -24,8 +24,17 @@ Este documento mapeia o comportamento esperado do sistema de Gestão de Estagiá
 
 ### 📄 Contratos (O Elo Central)
 - **Regras:**
-  - Um contrato é a união obrigatória de: **1 Estudante + 1 Instituição + 1 Supervisor**.
+  - **Vaga Obrigatória:** Um contrato deve obrigatoriamente estar vinculado a uma **Vaga de Estágio** aberta.
+  - **União de Entidades:** 1 Estudante + 1 Instituição + 1 Supervisor + 1 Vaga.
+  - **Coerência de Lotação:** O supervisor do contrato deve pertencer à mesma Unidade/Subunidade da vaga vinculada.
   - **Datas:** Exige Data de Início e Data de Fim.
+...
+### 💼 Vagas de Estágio (Positions)
+- **Regras:**
+  - **Validação de Supervisor:** Só é permitido criar uma vaga para uma subunidade que possua pelo menos um supervisor cadastrado.
+  - **Capacidade:** Controla o número máximo de estagiários (`quantidade`) permitidos para aquela lotação.
+  - **Ocupação:** O sistema monitora quantos contratos ativos estão vinculados à vaga. Ao atingir o limite, a vaga não deve aceitar novos contratos.
+  - **Status:** Podem ser `Aberta`, `Ocupada` ou `Suspensa`.
   - **Valores:** Mantém registro de Valor da Bolsa e Valor do Auxílio Transporte.
   - **Status:** Possui status que varia entre `Ativo` e `Encerrado`.
   - **Seguro:** Deve conter o registro da apólice de seguro do estagiário.

@@ -4,6 +4,7 @@ import {
     LayoutDashboard,
     Users,
     Building2,
+    Briefcase,
     FileText,
     LogOut,
     Menu,
@@ -21,6 +22,7 @@ const Layout = ({ children }) => {
         { icon: Users, label: 'Estudantes', path: '/students' },
         { icon: Building2, label: 'Empresas', path: '/institutions' },
         { icon: Users, label: 'Supervisores', path: '/supervisors' },
+        { icon: Briefcase, label: 'Vagas', path: '/positions' },
         { icon: FileText, label: 'Contratos', path: '/contracts' },
     ];
 

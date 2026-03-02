@@ -12,11 +12,13 @@ import DashboardOverview from './pages/DashboardOverview';
 import StudentsList from './pages/StudentsList';
 import InstitutionsList from './pages/InstitutionsList';
 import SupervisorsList from './pages/SupervisorsList';
+import PositionsList from './pages/PositionsList';
 import ContractsList from './pages/ContractsList';
 
 import StudentForm from './pages/StudentForm';
 import InstitutionForm from './pages/InstitutionForm';
 import SupervisorForm from './pages/SupervisorForm';
+import PositionForm from './pages/PositionForm';
 import ContractForm from './pages/ContractForm';
 
 function App() {
@@ -42,6 +44,7 @@ function App() {
         <Route path="/students" element={<Layout><StudentsList /></Layout>} />
         <Route path="/institutions" element={<Layout><InstitutionsList /></Layout>} />
         <Route path="/supervisors" element={<Layout><SupervisorsList /></Layout>} />
+        <Route path="/positions" element={<Layout><PositionsList /></Layout>} />
         <Route path="/contracts" element={<Layout><ContractsList /></Layout>} />
 
         {/* Forms - Wrapped in Layout for consistency */}
@@ -53,6 +56,9 @@ function App() {
 
         <Route path="/supervisor/new" element={<Layout><SupervisorForm /></Layout>} />
         <Route path="/supervisor/edit/:id" element={<Layout><SupervisorForm /></Layout>} />
+
+        <Route path="/position/new" element={<Layout><PositionForm /></Layout>} />
+        <Route path="/position/edit/:id" element={<Layout><PositionForm /></Layout>} />
 
         <Route path="/contract/new" element={<Layout><ContractForm /></Layout>} />
         <Route path="/contract/edit/:id" element={<Layout><ContractForm /></Layout>} />

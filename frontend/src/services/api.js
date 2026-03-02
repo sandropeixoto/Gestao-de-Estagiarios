@@ -64,6 +64,23 @@ export const listLotacoes = async () => {
     return api.get('/lotacao');
 };
 
+// Positions
+export const createPosition = async (data) => {
+    return api.post('/position/create', data);
+};
+
+export const listPositions = async () => {
+    return api.get('/position/list');
+};
+
+export const updatePosition = async (id, data) => {
+    return api.put(`/position/${id}`, data);
+};
+
+export const deletePosition = async (id) => {
+    return api.delete(`/position/${id}`);
+};
+
 export const createContract = async (data) => {
     return api.post('/contract/create', data);
 };

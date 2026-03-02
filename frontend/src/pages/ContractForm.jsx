@@ -5,7 +5,7 @@ import PageHeader from '../components/ui/PageHeader';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
-import { createContract, updateContract, listContracts, listStudents, listInstitutions, listSupervisors } from '../services/api';
+import { createContract, updateContract, listContracts, listStudents, listInstitutions, listSupervisors, listPositions } from '../services/api';
 
 const ContractForm = () => {
     const navigate = useNavigate();
@@ -18,11 +18,13 @@ const ContractForm = () => {
     const [students, setStudents] = useState([]);
     const [institutions, setInstitutions] = useState([]);
     const [supervisors, setSupervisors] = useState([]);
+    const [positions, setPositions] = useState([]);
 
     const [formData, setFormData] = useState({
         student_id: '',
         institution_id: '',
         supervisor_id: '',
+        position_id: '',
         data_inicio: '',
         data_fim: '',
         valor_bolsa: '',
@@ -35,15 +37,17 @@ const ContractForm = () => {
     useEffect(() => {
         const fetchDependencies = async () => {
             try {
-                const [studentsRes, institutionsRes, supervisorsRes, contractsRes] = await Promise.all([
+                const [studentsRes, institutionsRes, supervisorsRes, positionsRes, contractsRes] = await Promise.all([
                     listStudents(),
                     listInstitutions(),
                     listSupervisors(),
+                    listPositions(),
                     isEditing ? listContracts() : Promise.resolve({ data: [] })
                 ]);
                 setStudents(studentsRes.data);
                 setInstitutions(institutionsRes.data);
                 setSupervisors(supervisorsRes.data);
+                setPositions(positionsRes.data);
 
                 if (isEditing) {
                     const contract = contractsRes.data.find(c => String(c.id) === String(id));
@@ -52,6 +56,7 @@ const ContractForm = () => {
                             student_id: contract.student_id || '',
                             institution_id: contract.institution_id || '',
                             supervisor_id: contract.supervisor_id || '',
+                            position_id: contract.position_id || '',
                             data_inicio: contract.data_inicio || '',
                             data_fim: contract.data_fim || '',
                             valor_bolsa: contract.valor_bolsa || '',
@@ -74,6 +79,26 @@ const ContractForm = () => {
 
         fetchDependencies();
     }, []);
+
+    // Filtra supervisores que pertencem à mesma lotação da vaga selecionada
+    const filteredSupervisors = formData.position_id
+        ? (() => {
+            const selectedPos = positions.find(p => String(p.id) === String(formData.position_id));
+            return supervisors.filter(s => String(s.lotacao_id) === String(selectedPos?.lotacao_id));
+          })()
+        : [];
+
+    const handlePositionChange = (e) => {
+        const posId = e.target.value;
+        const selectedPos = positions.find(p => String(p.id) === String(posId));
+        
+        setFormData(prev => ({ 
+            ...prev, 
+            position_id: posId,
+            supervisor_id: '', // Reset supervisor ao trocar a vaga
+            valor_bolsa: selectedPos?.remuneracao_base || prev.valor_bolsa
+        }));
+    };
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -123,6 +148,22 @@ const ContractForm = () => {
                 )}
 
                 <form onSubmit={handleSubmit}>
+                    <div className="mb-6 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
+                        <Select
+                            id="position_id"
+                            label="Vaga de Estágio Selecionada *"
+                            value={formData.position_id}
+                            onChange={handlePositionChange}
+                            required
+                            options={positions
+                                .filter(p => p.status === 'Aberta' || String(p.id) === String(formData.position_id))
+                                .map(p => ({ 
+                                    value: p.id, 
+                                    label: `${p.lotacoes?.unidade} - ${p.lotacoes?.subunidade} (${p.occupied_slots}/${p.quantidade})` 
+                                }))}
+                        />
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Select
                             id="student_id"
@@ -145,11 +186,12 @@ const ContractForm = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Select
                             id="supervisor_id"
-                            label="Supervisor *"
+                            label="Supervisor (Filtrado por Vaga) *"
                             value={formData.supervisor_id}
                             onChange={handleChange}
                             required
-                            options={supervisors.map(s => ({ value: s.id, label: s.nome }))}
+                            disabled={!formData.position_id}
+                            options={filteredSupervisors.map(s => ({ value: s.id, label: s.nome }))}
                         />
                         <Select
                             id="status"
