@@ -4,47 +4,77 @@ import Layout from '../components/Layout';
 import PageHeader from '../components/ui/PageHeader';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import { createSupervisor, updateSupervisor, listSupervisors } from '../services/api';
+import Select from '../components/ui/Select';
+import { createSupervisor, updateSupervisor, listSupervisors, listLotacoes } from '../services/api';
 
 const SupervisorForm = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditing = !!id;
     const [isLoading, setIsLoading] = useState(false);
+    const [lotacoes, setLotacoes] = useState([]);
     const [formData, setFormData] = useState({
         nome: '',
         cargo: '',
-        area: ''
+        area: '',
+        lotacao_id: ''
     });
+    const [selectedUnidade, setSelectedUnidade] = useState('');
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (isEditing) {
-            setIsLoading(true);
-            listSupervisors()
-                .then(res => {
-                    const supervisor = res.data.find(s => String(s.id) === String(id));
+        setIsLoading(true);
+        const fetchData = async () => {
+            try {
+                const lotacoesRes = await listLotacoes();
+                setLotacoes(lotacoesRes.data);
+
+                if (isEditing) {
+                    const supervisorsRes = await listSupervisors();
+                    const supervisor = supervisorsRes.data.find(s => String(s.id) === String(id));
                     if (supervisor) {
                         setFormData({
                             nome: supervisor.nome || '',
                             cargo: supervisor.cargo || '',
-                            area: supervisor.area || ''
+                            area: supervisor.area || '',
+                            lotacao_id: supervisor.lotacao_id || ''
                         });
+                        
+                        if (supervisor.lotacao_id) {
+                            const currentLotacao = lotacoesRes.data.find(l => String(l.id) === String(supervisor.lotacao_id));
+                            if (currentLotacao) {
+                                setSelectedUnidade(currentLotacao.unidade);
+                            }
+                        }
                     } else {
                         setError('Supervisor não encontrado.');
                     }
-                })
-                .catch(err => {
-                    console.error(err);
-                    setError('Erro ao carregar dados do supervisor.');
-                })
-                .finally(() => setIsLoading(false));
-        }
+                }
+            } catch (err) {
+                console.error(err);
+                setError('Erro ao carregar dados necessários.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
     }, [id, isEditing]);
+
+    const unidades = [...new Set(lotacoes.map(l => l.unidade))].sort().map(u => ({ value: u, label: u }));
+    const subunidades = lotacoes
+        .filter(l => l.unidade === selectedUnidade)
+        .sort((a, b) => a.subunidade.localeCompare(b.subunidade))
+        .map(l => ({ value: l.id, label: l.subunidade }));
 
     const handleChange = (e) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleUnidadeChange = (e) => {
+        setSelectedUnidade(e.target.value);
+        setFormData(prev => ({ ...prev, lotacao_id: '' }));
     };
 
     const handleSubmit = async (e) => {
@@ -52,11 +82,18 @@ const SupervisorForm = () => {
         setIsLoading(true);
         setError('');
 
+        const dataToSave = {
+            nome: formData.nome,
+            cargo: formData.cargo,
+            area: formData.area,
+            lotacao_id: formData.lotacao_id || null
+        };
+
         try {
             if (isEditing) {
-                await updateSupervisor(id, formData);
+                await updateSupervisor(id, dataToSave);
             } else {
-                await createSupervisor(formData);
+                await createSupervisor(dataToSave);
             }
             navigate('/supervisors');
         } catch (err) {
@@ -105,6 +142,24 @@ const SupervisorForm = () => {
                             value={formData.area}
                             onChange={handleChange}
                             placeholder="Ex: Tecnologia"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Select
+                            id="unidade"
+                            label="Unidade"
+                            value={selectedUnidade}
+                            onChange={handleUnidadeChange}
+                            options={unidades}
+                        />
+                        <Select
+                            id="lotacao_id"
+                            label="Subunidade"
+                            value={formData.lotacao_id}
+                            onChange={handleChange}
+                            options={subunidades}
+                            disabled={!selectedUnidade}
                         />
                     </div>
 

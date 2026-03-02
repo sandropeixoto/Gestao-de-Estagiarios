@@ -59,6 +59,11 @@ export const deleteSupervisor = async (id) => {
     return api.delete(`/supervisor/${id}`);
 };
 
+// Lotacoes
+export const listLotacoes = async () => {
+    return api.get('/lotacao');
+};
+
 export const createContract = async (data) => {
     return api.post('/contract/create', data);
 };

@@ -19,6 +19,7 @@ Este documento mapeia o comportamento esperado do sistema de Gestão de Estagiá
 ### 👨‍💼 Supervisores
 - **Regras:**
   - Devem ser vinculados a uma área e a um cargo específico.
+  - **Lotação:** É obrigatório vincular o supervisor a uma Unidade e Subunidade (Lotação) pré-definida no sistema.
   - São fundamentais para a avaliação de desempenho e assinatura de controle de frequência.
 
 ### 📄 Contratos (O Elo Central)

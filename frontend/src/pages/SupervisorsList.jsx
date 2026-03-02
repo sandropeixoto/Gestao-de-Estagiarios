@@ -50,6 +50,7 @@ const SupervisorsList = () => {
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nome</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Cargo</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Área</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Unidade / Subunidade</th>
                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Ações</th>
                         </tr>
                     </thead>
@@ -59,6 +60,18 @@ const SupervisorsList = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{s.nome}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">{s.cargo}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">{s.area}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                                    {s.lotacoes ? (
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-bold text-primary">{s.lotacoes.unidade}</span>
+                                            <span className="text-[10px] text-gray-400 truncate max-w-[200px]" title={s.lotacoes.subunidade}>
+                                                {s.lotacoes.subunidade}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-300 italic text-xs">Não definida</span>
+                                    )}
+                                </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button onClick={() => navigate(`/supervisor/edit/${s.id}`)} className="text-indigo-600 hover:text-indigo-900 mr-4">
                                         <Pencil className="w-4 h-4 inline" />

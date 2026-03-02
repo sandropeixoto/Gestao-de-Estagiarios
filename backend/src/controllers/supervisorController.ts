@@ -18,7 +18,18 @@ export const createSupervisor = async (req: Request, res: Response) => {
 
 export const getAllSupervisors = async (req: Request, res: Response) => {
     try {
-        const { data, error } = await supabase.from(TABLE_NAME).select('*');
+        const { data, error } = await supabase
+            .from(TABLE_NAME)
+            .select(`
+                *,
+                lotacoes (
+                    id,
+                    unidade,
+                    subunidade,
+                    lotacao,
+                    municipio
+                )
+            `);
         if (error) throw error;
         res.status(200).json(data);
     } catch (error) {
