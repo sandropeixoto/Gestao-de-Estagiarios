@@ -5,12 +5,10 @@ import { supabase } from '../config/supabase';
 const TABLE_NAME = 'supervisors';
 
 export const createSupervisor = async (req: Request, res: Response) => {
-    // Add logic similar to student create, adapting fields
-    // For now, basic implementation
     try {
-        const { data, error } = await supabase.from(TABLE_NAME).insert([req.body]);
+        const { data, error } = await supabase.from(TABLE_NAME).insert([req.body]).select();
         if (error) throw error;
-        res.status(201).json({ message: 'Supervisor created.', data });
+        res.status(201).json({ message: 'Supervisor created.', data: data[0] });
     } catch (error) {
         res.status(503).json({ message: 'Error creating supervisor', error: (error as Error).message });
     }

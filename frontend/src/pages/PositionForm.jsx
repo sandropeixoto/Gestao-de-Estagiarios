@@ -80,8 +80,17 @@ const PositionForm = () => {
         setFormData(prev => ({ ...prev, lotacao_id: '' }));
     };
 
-    const handleSupervisorCreated = (newSupervisor) => {
-        setSupervisors([...supervisors, newSupervisor]);
+    const handleSupervisorCreated = async (newSupervisor) => {
+        try {
+            // Re-busca a lista para garantir que todos os dados (incluindo relacionamentos) estejam presentes
+            const supRes = await listSupervisors();
+            setSupervisors(supRes.data);
+        } catch (err) {
+            // Fallback para atualização manual se a busca falhar
+            if (newSupervisor) {
+                setSupervisors(prev => [...prev, newSupervisor]);
+            }
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -151,9 +160,8 @@ const PositionForm = () => {
                             </div>
                             <Button 
                                 type="button" 
-                                variant="secondary" 
                                 size="sm" 
-                                className="bg-amber-600 text-white hover:bg-amber-700 border-none shrink-0"
+                                className="bg-primary text-white hover:bg-brandText border-none shrink-0"
                                 onClick={() => setIsModalOpen(true)}
                             >
                                 <PlusCircle size={16} className="mr-2" />
