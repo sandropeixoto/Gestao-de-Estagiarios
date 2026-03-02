@@ -49,7 +49,7 @@ const SupervisorsList = () => {
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nome</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Cargo</th>
-                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Área</th>
+                            <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">E-mail</th>
                             <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Unidade / Subunidade</th>
                             <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Ações</th>
                         </tr>
@@ -59,7 +59,7 @@ const SupervisorsList = () => {
                             <tr key={s.id} className="hover:bg-gray-50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{s.nome}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">{s.cargo}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{s.area}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{s.email || '-'}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                                     {s.lotacoes ? (
                                         <div className="flex flex-col">

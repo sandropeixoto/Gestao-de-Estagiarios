@@ -16,7 +16,7 @@ const SupervisorForm = () => {
     const [formData, setFormData] = useState({
         nome: '',
         cargo: '',
-        area: '',
+        email: '',
         lotacao_id: ''
     });
     const [selectedUnidade, setSelectedUnidade] = useState('');
@@ -36,7 +36,7 @@ const SupervisorForm = () => {
                         setFormData({
                             nome: supervisor.nome || '',
                             cargo: supervisor.cargo || '',
-                            area: supervisor.area || '',
+                            email: supervisor.email || '',
                             lotacao_id: supervisor.lotacao_id || ''
                         });
                         
@@ -85,7 +85,7 @@ const SupervisorForm = () => {
         const dataToSave = {
             nome: formData.nome,
             cargo: formData.cargo,
-            area: formData.area,
+            email: formData.email,
             lotacao_id: formData.lotacao_id || null
         };
 
@@ -137,11 +137,12 @@ const SupervisorForm = () => {
                             placeholder="Ex: Gerente de TI"
                         />
                         <Input
-                            id="area"
-                            label="Área / Departamento"
-                            value={formData.area}
+                            id="email"
+                            label="E-mail"
+                            type="email"
+                            value={formData.email}
                             onChange={handleChange}
-                            placeholder="Ex: Tecnologia"
+                            placeholder="Ex: supervisor@empresa.com"
                         />
                     </div>
 
