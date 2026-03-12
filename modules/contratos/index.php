@@ -55,16 +55,19 @@ require_once __DIR__ . '/../../includes/header.php';
                             <div class="text-xs text-gray-500">Aux: R$ <?= number_format($c['valor_transporte'], 2, ',', '.') ?></div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-2.5 py-1 text-xs font-bold rounded-full 
-                                <?= $c['status'] == 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700' ?>">
-                                <?= $c['status'] ?>
-                            </span>
+                            <?php if ($c['status'] == 'Ativo'): ?>
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-green-100 text-green-700">Ativo</span>
+                            <?php else: ?>
+                                <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-700">Encerrado</span>
+                                <div class="text-[10px] text-red-500 font-bold mt-1 uppercase"><?= htmlspecialchars($c['motivo_desligamento']) ?></div>
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <button class="text-slate-600 hover:text-slate-900 mx-2" title="Visualizar/Imprimir"><i class="fas fa-print"></i></button>
-                            <button class="text-red-600 hover:text-red-900 mx-2" title="Encerrar Contrato"><i class="fas fa-user-slash"></i></button>
-                        </td>
-                    </tr>
+                            <?php if ($c['status'] == 'Ativo'): ?>
+                                <a href="desligar.php?id=<?= $c['id'] ?>" class="text-red-600 hover:text-red-900 mx-2" title="Encerrar Contrato"><i class="fas fa-user-slash"></i></a>
+                            <?php endif; ?>
+                        </td>                    </tr>
                 <?php endforeach; ?>
             <?php endif; ?>
         </tbody>
