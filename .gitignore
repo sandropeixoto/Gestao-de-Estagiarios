@@ -23,10 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Environment Variables
-.env
-.env.production
-.env.development
-.env.local
 
 # Editor directories and files
 .idea
@@ -38,7 +34,6 @@ yarn-error.log*
 *.sw?
 
 # Supabase
-supabase/functions/**/.env
 
 # Local dev
 backend/dist/
