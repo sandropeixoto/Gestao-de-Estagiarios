@@ -59,19 +59,19 @@ require_once __DIR__ . '/includes/header.php';
             <i class="fas fa-bolt text-amber-400 mr-3"></i> Ações Rápidas
         </h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="modules/contratos/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
+            <a href="<?= $baseUrl ?>modules/contratos/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
                 <i class="fas fa-file-signature text-2xl text-slate-400 group-hover:text-accent mb-3 block"></i>
                 <span class="text-sm font-bold text-gray-600 group-hover:text-white">Novo Contrato</span>
             </a>
-            <a href="modules/estudantes/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
+            <a href="<?= $baseUrl ?>modules/estudantes/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
                 <i class="fas fa-user-plus text-2xl text-slate-400 group-hover:text-accent mb-3 block"></i>
                 <span class="text-sm font-bold text-gray-600 group-hover:text-white">Novo Aluno</span>
             </a>
-            <a href="modules/vagas/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
+            <a href="<?= $baseUrl ?>modules/vagas/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
                 <i class="fas fa-plus-square text-2xl text-slate-400 group-hover:text-accent mb-3 block"></i>
                 <span class="text-sm font-bold text-gray-600 group-hover:text-white">Nova Vaga</span>
             </a>
-            <a href="modules/instituicoes/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
+            <a href="<?= $baseUrl ?>modules/instituicoes/novo.php" class="group p-6 bg-gray-50 rounded-2xl hover:bg-slate-800 transition-all text-center">
                 <i class="fas fa-building text-2xl text-slate-400 group-hover:text-accent mb-3 block"></i>
                 <span class="text-sm font-bold text-gray-600 group-hover:text-white">Nova Instituição</span>
             </a>

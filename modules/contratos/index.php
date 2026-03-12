@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <h1 class="text-3xl font-bold text-gray-800">Contratos de Estágio</h1>
         <p class="text-gray-500">Acompanhamento de vigência, bolsas e desligamentos.</p>
     </div>
-    <a href="novo.php" class="bg-slate-700 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
+    <a href="<?= $baseUrl ?>modules/contratos/novo.php" class="bg-slate-700 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
         <i class="fas fa-file-contract mr-2"></i> Novo Contrato
     </a>
 </div>

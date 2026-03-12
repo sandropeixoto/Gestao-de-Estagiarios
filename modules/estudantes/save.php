@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         if ($studentModel->create($data)) {
-            header('Location: ../../index.php?status=success&message=Estudante cadastrado com sucesso!');
+            header('Location: index.php?status=success&message=Estudante cadastrado com sucesso!');
         } else {
             header('Location: novo.php?status=error&message=Erro ao cadastrar estudante.');
         }

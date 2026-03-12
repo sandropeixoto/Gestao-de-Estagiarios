@@ -1,7 +1,20 @@
 <?php
-// Base URL detection for consistent links in nested folders
+// Detecção dinâmica da URL base para garantir que os links funcionem em qualquer ambiente
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-$baseUrl = $protocol . "://" . $_SERVER['HTTP_HOST'] . "/Dev/Gestao-de-Estagiarios/";
+$host = $_SERVER['HTTP_HOST'];
+$scriptName = $_SERVER['SCRIPT_NAME']; // ex: /Gestao-de-Estagiarios/modules/estudantes/index.php
+
+// Pega o caminho do diretório atual em relação à raiz do servidor
+$currentDir = dirname($scriptName); // ex: /Gestao-de-Estagiarios/modules/estudantes
+
+// Calcula quantos níveis subir para chegar na raiz do projeto
+// Assumindo que este arquivo header.php está em includes/ (1 nível abaixo da raiz)
+$basePath = str_replace('\\', '/', dirname(__DIR__));
+$serverRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
+$relativeUrlPath = str_replace($serverRoot, '', $basePath);
+
+// Garante que a URL termine com /
+$baseUrl = $protocol . "://" . $host . rtrim($relativeUrlPath, '/') . "/";
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">

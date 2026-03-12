@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <h1 class="text-3xl font-bold text-gray-800">Supervisores</h1>
         <p class="text-gray-500">Gestores responsáveis pelos estagiários em cada lotação.</p>
     </div>
-    <a href="novo.php" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
+    <a href="<?= $baseUrl ?>modules/supervisores/novo.php" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
         <i class="fas fa-plus mr-2"></i> Novo Supervisor
     </a>
 </div>

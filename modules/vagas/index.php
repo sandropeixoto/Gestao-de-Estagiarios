@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <h1 class="text-3xl font-bold text-gray-800">Vagas e Oportunidades</h1>
         <p class="text-gray-500">Controle de vagas abertas, ocupadas e suspensas.</p>
     </div>
-    <a href="novo.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
+    <a href="<?= $baseUrl ?>modules/vagas/novo.php" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
         <i class="fas fa-plus mr-2"></i> Nova Vaga
     </a>
 </div>

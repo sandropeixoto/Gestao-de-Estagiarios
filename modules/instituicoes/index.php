@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <h1 class="text-3xl font-bold text-gray-800">Instituições de Ensino</h1>
         <p class="text-gray-500">Convênios e contatos das instituições parceiras.</p>
     </div>
-    <a href="novo.php" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
+    <a href="<?= $baseUrl ?>modules/instituicoes/novo.php" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-lg transition-all flex items-center font-semibold">
         <i class="fas fa-plus mr-2"></i> Nova Instituição
     </a>
 </div>
