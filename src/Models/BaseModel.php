@@ -24,6 +24,20 @@ abstract class BaseModel {
 
     public function delete($id) {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        return $stmt->execute([id]);
+        return $stmt->execute([$id]);
+    }
+
+    public function update($id, $data) {
+        $fields = "";
+        foreach ($data as $key => $value) {
+            $fields .= "{$key} = :{$key}, ";
+        }
+        $fields = rtrim($fields, ", ");
+        
+        $sql = "UPDATE {$this->table} SET {$fields} WHERE id = :id";
+        $data['id'] = $id;
+        
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($data);
     }
 }
