@@ -7,7 +7,7 @@ class Supervisor extends BaseModel {
     protected $table = 'supervisors';
 
     public function allWithLotacao() {
-        $sql = "SELECT s.*, l.subunidade, l.unidade, l.municipio 
+        $sql = "SELECT s.*, l.unidade, l.subunidade 
                 FROM supervisors s
                 LEFT JOIN lotacoes l ON s.lotacao_id = l.id
                 ORDER BY s.nome ASC";

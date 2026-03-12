@@ -24,19 +24,19 @@ require_once __DIR__ . '/../../includes/header.php';
             <tr>
                 <th class="px-6 py-4 text-left">Supervisor / Cargo</th>
                 <th class="px-6 py-4 text-left">Contato</th>
-                <th class="px-6 py-4 text-left">Lotação / Município</th>
+                <th class="px-6 py-4 text-left">Unidade / Subunidade</th>
                 <th class="px-6 py-4 text-center">Ações</th>
-            </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-100">
-            <?php if (empty($supervisores)): ?>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                <?php if (empty($supervisores)): ?>
                 <tr>
                     <td colspan="4" class="px-6 py-12 text-center text-gray-400">
                         <i class="fas fa-user-tie text-4xl mb-4 block"></i>
                         Nenhum supervisor cadastrado.
                     </td>
                 </tr>
-            <?php else: ?>
+                <?php else: ?>
                 <?php foreach($supervisores as $s): ?>
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -49,9 +49,8 @@ require_once __DIR__ . '/../../includes/header.php';
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-700 font-bold"><?= htmlspecialchars($s['unidade'] ?: 'N/A') ?></div>
-                            <div class="text-xs text-gray-500"><?= htmlspecialchars($s['municipio'] ?: 'N/A') ?></div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            <div class="text-xs text-gray-500 font-medium"><?= htmlspecialchars($s['subunidade'] ?: 'N/A') ?></div>
+                        </td>                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <a href="editar.php?id=<?= $s['id'] ?>" class="text-emerald-600 hover:text-emerald-900 mx-2"><i class="fas fa-edit"></i></a>
                             <a href="delete.php?id=<?= $s['id'] ?>" onclick="return confirm('Excluir este supervisor?')" class="text-red-600 hover:text-red-900 mx-2"><i class="fas fa-trash-alt"></i></a>
                         </td>                    </tr>
