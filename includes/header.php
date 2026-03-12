@@ -1,20 +1,19 @@
 <?php
-// Detecção dinâmica da URL base para garantir que os links funcionem em qualquer ambiente
+// Detecção dinâmica da URL base
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
-$scriptName = $_SERVER['SCRIPT_NAME']; // ex: /Gestao-de-Estagiarios/modules/estudantes/index.php
+$scriptName = $_SERVER['SCRIPT_NAME']; 
 
-// Pega o caminho do diretório atual em relação à raiz do servidor
-$currentDir = dirname($scriptName); // ex: /Gestao-de-Estagiarios/modules/estudantes
-
-// Calcula quantos níveis subir para chegar na raiz do projeto
-// Assumindo que este arquivo header.php está em includes/ (1 nível abaixo da raiz)
 $basePath = str_replace('\\', '/', dirname(__DIR__));
 $serverRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
 $relativeUrlPath = str_replace($serverRoot, '', $basePath);
-
-// Garante que a URL termine com /
 $baseUrl = $protocol . "://" . $host . rtrim($relativeUrlPath, '/') . "/";
+
+// Lógica para detectar página ativa
+$currentPath = $_SERVER['REQUEST_NAME'] ?? $_SERVER['PHP_SELF'];
+function isActive($path, $currentPath) {
+    return strpos($currentPath, $path) !== false ? 'bg-slate-800 text-white border-l-4 border-accent' : 'text-gray-400 hover:bg-slate-800 hover:text-white border-l-4 border-transparent';
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -61,7 +60,7 @@ $baseUrl = $protocol . "://" . $host . rtrim($relativeUrlPath, '/') . "/";
 </head>
 <body class="bg-gray-50 flex min-h-screen">
     <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar-transition fixed inset-y-0 left-0 bg-secondary text-gray-400 w-64 z-50 shadow-2xl overflow-hidden">
+    <aside id="sidebar" class="sidebar-transition fixed inset-y-0 left-0 bg-secondary w-64 z-50 shadow-2xl overflow-hidden">
         <div class="flex flex-col h-full">
             <!-- Brand -->
             <div class="h-16 flex items-center px-6 bg-slate-900 text-white">
@@ -71,28 +70,28 @@ $baseUrl = $protocol . "://" . $host . rtrim($relativeUrlPath, '/') . "/";
 
             <!-- Navigation -->
             <nav class="flex-grow py-6 space-y-1">
-                <a href="<?= $baseUrl ?>index.php" class="flex items-center px-6 py-3 text-white hover:bg-slate-800 border-l-4 border-accent transition-all">
-                    <i class="fas fa-th-large w-6"></i>
+                <a href="<?= $baseUrl ?>index.php" class="flex items-center px-6 py-3 transition-all <?= (basename($currentPath) == 'index.php' && strpos($currentPath, 'modules') === false) ? 'bg-slate-800 text-white border-l-4 border-accent' : 'text-gray-400 hover:bg-slate-800 hover:text-white border-l-4 border-transparent' ?>">
+                    <i class="fas fa-th-large w-6 text-center"></i>
                     <span class="sidebar-label ml-3 font-medium">Dashboard</span>
                 </a>
-                <a href="<?= $baseUrl ?>modules/estudantes/index.php" class="flex items-center px-6 py-3 hover:bg-slate-800 hover:text-white transition-all">
-                    <i class="fas fa-user-graduate w-6"></i>
+                <a href="<?= $baseUrl ?>modules/estudantes/index.php" class="flex items-center px-6 py-3 transition-all <?= isActive('modules/estudantes/', $currentPath) ?>">
+                    <i class="fas fa-user-graduate w-6 text-center"></i>
                     <span class="sidebar-label ml-3 font-medium">Estudantes</span>
                 </a>
-                <a href="<?= $baseUrl ?>modules/instituicoes/index.php" class="flex items-center px-6 py-3 hover:bg-slate-800 hover:text-white transition-all">
-                    <i class="fas fa-university w-6"></i>
+                <a href="<?= $baseUrl ?>modules/instituicoes/index.php" class="flex items-center px-6 py-3 transition-all <?= isActive('modules/instituicoes/', $currentPath) ?>">
+                    <i class="fas fa-university w-6 text-center"></i>
                     <span class="sidebar-label ml-3 font-medium">Instituições</span>
                 </a>
-                <a href="<?= $baseUrl ?>modules/supervisores/index.php" class="flex items-center px-6 py-3 hover:bg-slate-800 hover:text-white transition-all">
-                    <i class="fas fa-user-tie w-6"></i>
+                <a href="<?= $baseUrl ?>modules/supervisores/index.php" class="flex items-center px-6 py-3 transition-all <?= isActive('modules/supervisores/', $currentPath) ?>">
+                    <i class="fas fa-user-tie w-6 text-center"></i>
                     <span class="sidebar-label ml-3 font-medium">Supervisores</span>
                 </a>
-                <a href="<?= $baseUrl ?>modules/vagas/index.php" class="flex items-center px-6 py-3 hover:bg-slate-800 hover:text-white transition-all">
-                    <i class="fas fa-briefcase w-6"></i>
+                <a href="<?= $baseUrl ?>modules/vagas/index.php" class="flex items-center px-6 py-3 transition-all <?= isActive('modules/vagas/', $currentPath) ?>">
+                    <i class="fas fa-briefcase w-6 text-center"></i>
                     <span class="sidebar-label ml-3 font-medium">Vagas</span>
                 </a>
-                <a href="<?= $baseUrl ?>modules/contratos/index.php" class="flex items-center px-6 py-3 hover:bg-slate-800 hover:text-white transition-all">
-                    <i class="fas fa-file-contract w-6"></i>
+                <a href="<?= $baseUrl ?>modules/contratos/index.php" class="flex items-center px-6 py-3 transition-all <?= isActive('modules/contratos/', $currentPath) ?>">
+                    <i class="fas fa-file-contract w-6 text-center"></i>
                     <span class="sidebar-label ml-3 font-medium">Contratos</span>
                 </a>
             </nav>

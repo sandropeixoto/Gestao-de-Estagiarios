@@ -18,7 +18,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <p class="text-indigo-100 mt-1">Defina os requisitos e a lotação para a nova oportunidade.</p>
         </div>
         
-        <form action="save_position.php" method="POST" class="p-8 space-y-6">
+        <form action="save.php" method="POST" class="p-8 space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Lotação -->
                 <div class="space-y-2">

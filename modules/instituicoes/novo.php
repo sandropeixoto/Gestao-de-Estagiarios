@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <p class="text-blue-100 mt-1">Gerencie os convênios com as instituições parceiras.</p>
         </div>
         
-        <form action="save_institution.php" method="POST" class="p-8 space-y-8">
+        <form action="save.php" method="POST" class="p-8 space-y-8">
             <!-- Informações Principais -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">

@@ -15,7 +15,7 @@ require_once __DIR__ . '/../../includes/header.php';
             <p class="text-emerald-100 mt-1">Registre os responsáveis pelo acompanhamento dos estagiários.</p>
         </div>
         
-        <form action="save_supervisor.php" method="POST" class="p-8 space-y-6">
+        <form action="save.php" method="POST" class="p-8 space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-gray-700">Nome Completo</label>
