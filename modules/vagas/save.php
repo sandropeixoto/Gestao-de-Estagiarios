@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../src/Models/Position.php';
+require_once __DIR__ . '/../../src/Models/Position.php';
 
 use App\Models\Position;
 
