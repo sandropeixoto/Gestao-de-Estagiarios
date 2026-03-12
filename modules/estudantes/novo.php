@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../src/Models/Student.php';
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../../src/Models/Student.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $db = Database::getConnection();
 
@@ -28,7 +28,7 @@ $niveis = $db->query("SELECT id, descricao FROM niveis_escolaridade ORDER BY des
                 <p class="text-blue-100 mt-1">Insira as informações acadêmicas e pessoais do novo estagiário.</p>
             </div>
             
-            <form action="save_student.php" method="POST" class="p-8 space-y-6">
+            <form action="save.php" method="POST" class="p-8 space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Nome Completo -->
                     <div class="space-y-2">
@@ -86,7 +86,7 @@ $niveis = $db->query("SELECT id, descricao FROM niveis_escolaridade ORDER BY des
                 </div>
 
                 <div class="pt-6 border-t border-gray-100 flex justify-end space-x-4">
-                    <a href="index.php" class="px-6 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-all font-medium">Cancelar</a>
+                    <a href="../../index.php" class="px-6 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-all font-medium">Cancelar</a>
                     <button type="submit" class="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg shadow-blue-200 transition-all font-bold">Salvar Estudante</button>
                 </div>
             </form>
