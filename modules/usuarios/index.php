@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../src/Models/User.php';
 
 use App\Models\User;
 
-if ($userLevel > 2) { die("Acesso restrito."); }
+if (!canManageUsers()) { die("Acesso restrito."); }
 
 $userModel = new User();
 
@@ -28,7 +28,10 @@ $allowVisitors = $userModel->getSetting('allow_visitors');
     
     <!-- Chave Liga/Desliga Visitantes -->
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-        <span class="text-sm font-bold text-gray-700 uppercase tracking-wider">Permitir Visitantes (Consultor):</span>
+        <div class="text-right">
+            <span class="text-sm font-bold text-gray-700 uppercase block leading-none">Acesso Visitantes</span>
+            <span class="text-[10px] text-gray-400">Usuários não cadastrados entram como visualizadores</span>
+        </div>
         <form method="POST" class="flex items-center">
             <input type="hidden" name="toggle_visitors" value="1">
             <input type="hidden" name="current_value" value="<?= $allowVisitors ?>">
@@ -36,12 +39,12 @@ $allowVisitors = $userModel->getSetting('allow_visitors');
                 <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform <?= $allowVisitors == '1' ? 'translate-x-6' : 'translate-x-1' ?>"></span>
             </button>
             <span class="ml-2 text-xs font-bold <?= $allowVisitors == '1' ? 'text-green-600' : 'text-gray-400' ?>">
-                <?= $allowVisitors == '1' ? 'LIGADO' : 'DESLIGADO' ?>
+                <?= $allowVisitors == '1' ? 'ATIVO' : 'BLOQUEADO' ?>
             </span>
         </form>
     </div>
 
-    <a href="novo.php" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center">
+    <a href="novo.php" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center transform hover:scale-105">
         <i class="fas fa-user-plus mr-2"></i> Novo Usuário
     </a>
 </div>
@@ -75,6 +78,8 @@ $allowVisitors = $userModel->getSetting('allow_visitors');
                         $label = 'Consultor';
                         if ($u['nivel_acesso'] == 1) { $badgeClass = 'bg-purple-100 text-purple-800'; $label = 'Administrador'; }
                         if ($u['nivel_acesso'] == 2) { $badgeClass = 'bg-blue-100 text-blue-800'; $label = 'Gestor'; }
+                        if ($u['nivel_acesso'] == 3) { $badgeClass = 'bg-green-100 text-green-800'; $label = 'Consultor'; }
+                        if ($u['nivel_acesso'] == 4) { $badgeClass = 'bg-orange-100 text-orange-800'; $label = 'Visitante'; }
                     ?>
                     <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?= $badgeClass ?>">
                         <?= $label ?>
@@ -84,7 +89,7 @@ $allowVisitors = $userModel->getSetting('allow_visitors');
                     <?= $u['ultimo_acesso'] ? date('d/m/Y H:i', strtotime($u['ultimo_acesso'])) : 'Nunca' ?>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="editar.php?id=<?= $u['id'] ?>" class="text-blue-600 hover:text-blue-900 bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-user-edit"></i> Alterar Perfil</a>
+                    <a href="editar.php?id=<?= $u['id'] ?>" class="text-blue-600 hover:text-blue-900 bg-blue-50 p-2 rounded-lg transition-colors"><i class="fas fa-user-edit"></i> Alterar</a>
                 </td>
             </tr>
             <?php endforeach; ?>

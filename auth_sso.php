@@ -1,7 +1,7 @@
 <?php
 /**
- * SSO Authentication Handler - GestorGov Integration (Governance v2)
- * Orion Orchestrator: Manual Approval Policy + Visitor Toggle
+ * SSO Authentication Handler - GestorGov Integration (Governance v3)
+ * Orion Orchestrator: Super-Admin Bypass + Visitor Management
  */
 
 require_once __DIR__ . '/config/database.php';
@@ -37,31 +37,30 @@ if (!$userData || time() > $userData['exp']) {
     die("Acesso negado: Token malformado ou expirado.");
 }
 
-// 5. Política de Governança: Somente Cadastrados ou Visitantes Permitidos
+// 5. Política de Governança
 try {
     $userModel = new User();
     
-    // Mapear user_level string para inteiro antecipadamente para o bypass
-    $incomingLevel = 3; // Default Consultor
-    if (isset($userData['user_level'])) {
-        $levelMap = ['Administrador' => 1, 'Admin' => 1, 'Gestor' => 2];
-        $incomingLevel = is_numeric($userData['user_level']) ? $userData['user_level'] : ($levelMap[$userData['user_level']] ?? 3);
-    }
+    // Identificar nível informado pelo Portal
+    $portalLevelString = $userData['user_level'] ?? 'Visitante';
+    $isPortalAdmin = (in_array($portalLevelString, ['Administrador', 'Admin']));
 
+    // Busca usuário local
     $localUser = $userModel->findBySSO($userData['user_id'], $userData['user_email']);
 
     if (!$localUser) {
-        // BYPASS: Se for Administrador no Portal, cadastrar automaticamente com poder total
-        if ($incomingLevel == 1) {
+        // A. CASO ADMINISTRADOR: Bypass Total + Cadastro Automático
+        if ($isPortalAdmin) {
             $userModel->createManual([
                 'nome' => $userData['user_name'],
                 'email' => $userData['user_email'],
                 'sso_user_id' => $userData['user_id'],
-                'nivel_acesso' => 1
+                'nivel_acesso' => 1 // Administrador
             ]);
             $localUser = $userModel->findBySSO($userData['user_id'], $userData['user_email']);
-        } else {
-            // Usuário não cadastrado. Verificar política de visitantes.
+        } 
+        // B. CASO VISITANTE: Verificar se a chave está ligada
+        else {
             $allowVisitors = $userModel->getSetting('allow_visitors');
 
             if ($allowVisitors === '1') {
@@ -69,18 +68,23 @@ try {
                     'id' => 0,
                     'nome' => $userData['user_name'] . ' (Visitante)',
                     'email' => $userData['user_email'],
-                    'nivel_acesso' => 3 // Consultor
+                    'nivel_acesso' => 4 // Nível Visitante (Apenas Visualização)
                 ];
             } else {
-                die("<div style='font-family: sans-serif; text-align: center; padding: 50px;'>
-                        <h1>🔒 Acesso Restrito</h1>
-                        <p>Olá <b>{$userData['user_name']}</b>, você está autenticado no Portal, mas ainda não possui cadastro neste módulo.</p>
-                        <p>Por favor, solicite seu acesso ao administrador do sistema.</p>
+                // Visitante Barrado: Mensagem solicitada pelo comandante
+                die("<div style='font-family: sans-serif; text-align: center; padding: 50px; background: #f8fafc; height: 100vh;'>
+                        <div style='max-width: 500px; margin: auto; background: white; padding: 40px; border-radius: 20px; shadow: 0 10px 15px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;'>
+                            <div style='font-size: 50px; margin-bottom: 20px;'>🔒</div>
+                            <h1 style='color: #1e293b;'>Acesso Não Autorizado</h1>
+                            <p style='color: #64748b; line-height: 1.6;'>Olá <b>{$userData['user_name']}</b>, você está autenticado no Portal GestorGov, mas este sistema exige um cadastro prévio realizado por um administrador.</p>
+                            <p style='color: #64748b; margin-top: 20px;'>Por favor, entre em contato com o gestor do módulo de estagiários para solicitar sua liberação.</p>
+                            <a href='#' onclick='window.history.back()' style='display: inline-block; margin-top: 30px; background: #3b82f6; color: white; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: bold;'>Voltar para o Portal</a>
+                        </div>
                      </div>");
             }
         }
     } else {
-        // Usuário Cadastrado: Atualizar timestamp de acesso
+        // Usuário Cadastrado: Atualizar acesso
         $userModel->update($localUser['id'], ['ultimo_acesso' => date('Y-m-d H:i:s')]);
     }
 
@@ -90,7 +94,7 @@ try {
     $_SESSION['user_id'] = $localUser['id'];
     $_SESSION['user_email'] = $localUser['email'];
     $_SESSION['user_name'] = $localUser['nome'];
-    $_SESSION['user_level'] = $localUser['nivel_acesso'];
+    $_SESSION['user_level'] = (int)$localUser['nivel_acesso'];
     $_SESSION['sso_authenticated'] = true;
 
     header("Location: index.php");
