@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../src/Models/Contract.php';
 require_once __DIR__ . '/../config/database.php';
 
@@ -50,6 +51,16 @@ $totalVagas = $db->query("SELECT COUNT(*) FROM positions WHERE status = 'Aberta'
                     <a href="modules/instituicoes/index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Instituições</a>
                     <a href="modules/vagas/index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Vagas</a>
                     <a href="modules/contratos/index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Contratos</a>
+                    
+                    <div class="flex items-center pl-4 border-l border-blue-400">
+                        <div class="text-right mr-3">
+                            <p class="text-xs font-bold uppercase"><?= htmlspecialchars($userName) ?></p>
+                            <p class="text-[10px] text-blue-200"><?= $isAdmin ? 'Administrador' : 'Operador' ?></p>
+                        </div>
+                        <a href="logout.php" class="bg-red-500 hover:bg-red-600 p-2 rounded-lg transition-colors shadow-sm" title="Sair do Sistema">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

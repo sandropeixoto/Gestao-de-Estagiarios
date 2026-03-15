@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/auth_check.php';
 // Detecção dinâmica da URL base
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
@@ -109,7 +110,7 @@ function isActive($path, $currentPath) {
         <!-- Topbar -->
         <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-40">
             <div class="flex items-center">
-                <h2 class="text-gray-500 font-medium hidden md:block">Bem-vindo, Administrador</h2>
+                <h2 class="text-gray-500 font-medium hidden md:block">Bem-vindo, <?= htmlspecialchars($userName) ?></h2>
             </div>
 
             <!-- Header Right Section -->
@@ -124,10 +125,10 @@ function isActive($path, $currentPath) {
                 <div class="relative">
                     <button onclick="toggleUserMenu()" class="flex items-center space-x-3 focus:outline-none">
                         <div class="text-right hidden sm:block">
-                            <p class="text-sm font-bold text-gray-800 leading-tight">Sandro Peixoto</p>
-                            <p class="text-xs text-gray-500">Gestor de RH</p>
+                            <p class="text-sm font-bold text-gray-800 leading-tight"><?= htmlspecialchars($userName) ?></p>
+                            <p class="text-xs text-gray-500"><?= $isAdmin ? 'Administrador' : 'Operador' ?></p>
                         </div>
-                        <img src="https://ui-avatars.com/api/?name=Sandro+Peixoto&background=1e40af&color=fff" class="w-10 h-10 rounded-full border-2 border-gray-100 shadow-sm" alt="Avatar">
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode($userName) ?>&background=1e40af&color=fff" class="w-10 h-10 rounded-full border-2 border-gray-100 shadow-sm" alt="Avatar">
                         <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                     </button>
 
@@ -140,7 +141,7 @@ function isActive($path, $currentPath) {
                             <i class="fas fa-cog mr-3 text-gray-400"></i> Configurações
                         </a>
                         <hr class="my-2 border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold flex items-center">
+                        <a href="<?= $baseUrl ?>public/logout.php" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold flex items-center">
                             <i class="fas fa-sign-out-alt mr-3"></i> Sair do Sistema
                         </a>
                     </div>
