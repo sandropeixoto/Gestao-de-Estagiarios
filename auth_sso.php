@@ -7,6 +7,11 @@
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/src/Models/User.php';
 
+// Garantir que o ambiente esteja carregado (Caso o servidor não o faça automaticamente)
+if (function_exists('loadEnv')) {
+    loadEnv(__DIR__ . '/.env');
+}
+
 use App\Models\User;
 
 // 1. Configuração do Segredo
@@ -45,6 +50,17 @@ if (time() > $userData['exp']) {
 
 // 5. Provisionamento Just-in-Time (JIT) e Login
 try {
+    // Mapear user_level string para inteiro, se necessário
+    if (isset($userData['user_level']) && !is_numeric($userData['user_level'])) {
+        $levelMap = [
+            'Administrador' => 1,
+            'Admin' => 1,
+            'Operador' => 2,
+            'Usuario' => 2
+        ];
+        $userData['user_level'] = $levelMap[$userData['user_level']] ?? 2;
+    }
+
     $userModel = new User();
     $localUser = $userModel->findOrCreateFromSSO($userData);
 
