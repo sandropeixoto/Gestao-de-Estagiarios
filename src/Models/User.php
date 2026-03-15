@@ -7,37 +7,47 @@ class User extends BaseModel {
     protected $table = 'users';
 
     /**
-     * Busca ou cria um usuário vindo do SSO (Just-in-Time Provisioning).
+     * Busca um usuário pelo ID SSO ou Email.
      */
-    public function findOrCreateFromSSO($ssoData) {
+    public function findBySSO($ssoId, $email) {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE sso_user_id = :sso_id OR email = :email");
         $stmt->execute([
-            ':sso_id' => $ssoData['user_id'],
-            ':email' => $ssoData['user_email']
+            ':sso_id' => $ssoId,
+            ':email' => $email
         ]);
-        $user = $stmt->fetch();
+        return $stmt->fetch();
+    }
 
-        if (!$user) {
-            // Cria usuário se não existir
-            $sql = "INSERT INTO {$this->table} (sso_user_id, nome, email, nivel_acesso) 
-                    VALUES (:sso_id, :nome, :email, :nivel)";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([
-                ':sso_id' => $ssoData['user_id'],
-                ':nome' => $ssoData['user_name'],
-                ':email' => $ssoData['user_email'],
-                ':nivel' => $ssoData['user_level'] ?? 2
-            ]);
-            $user = $this->find($this->db->lastInsertId());
-        } else {
-            // Atualiza último acesso e possivelmente outros dados
-            $this->update($user['id'], [
-                'sso_user_id' => $ssoData['user_id'],
-                'nome' => $ssoData['user_name'],
-                'nivel_acesso' => $ssoData['user_level'] ?? $user['nivel_acesso']
-            ]);
-        }
+    /**
+     * Cadastro Manual de Usuário (Gestores/Admin).
+     */
+    public function createManual($data) {
+        $sql = "INSERT INTO {$this->table} (sso_user_id, nome, email, nivel_acesso) 
+                VALUES (:sso_id, :nome, :email, :nivel)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            ':sso_id' => $data['sso_user_id'] ?? 0, // 0 se não for JIT
+            ':nome' => $data['nome'],
+            ':email' => $data['email'],
+            ':nivel' => $data['nivel_acesso']
+        ]);
+    }
 
-        return $user;
+    /**
+     * Busca configuração global.
+     */
+    public function getSetting($key) {
+        $stmt = $this->db->prepare("SELECT setting_value FROM system_settings WHERE setting_key = :key");
+        $stmt->execute([':key' => $key]);
+        $row = $stmt->fetch();
+        return $row ? $row['setting_value'] : null;
+    }
+
+    /**
+     * Atualiza configuração global.
+     */
+    public function updateSetting($key, $value) {
+        $stmt = $this->db->prepare("UPDATE system_settings SET setting_value = :value WHERE setting_key = :key");
+        return $stmt->execute([':key' => $key, ':value' => $value]);
     }
 }

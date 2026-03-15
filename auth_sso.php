@@ -1,24 +1,18 @@
 <?php
 /**
- * SSO Authentication Handler - GestorGov Integration
- * Orion Orchestrator: Validating HMAC-SHA256 signature and Provisioning JIT
+ * SSO Authentication Handler - GestorGov Integration (Governance v2)
+ * Orion Orchestrator: Manual Approval Policy + Visitor Toggle
  */
 
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/src/Models/User.php';
 
-// Garantir que o ambiente esteja carregado (Caso o servidor não o faça automaticamente)
-if (function_exists('loadEnv')) {
-    loadEnv(__DIR__ . '/.env');
-}
-
 use App\Models\User;
 
-// 1. Configuração do Segredo (Definição Direta para Integridade Total)
+// 1. Configuração do Segredo
 if (!defined('SSO_SECRET_KEY')) {
     define('SSO_SECRET_KEY', 'GestorGov_Secure_Integration_Token_2026!');
 }
-
 $ssoSecret = SSO_SECRET_KEY;
 
 // 2. Captura dos Parâmetros
@@ -27,48 +21,53 @@ $signatureReceived = $_GET['sso_sig'] ?? null;
 
 if (!$payloadBase64 || !$signatureReceived) {
     header("HTTP/1.1 401 Unauthorized");
-    die("Acesso negado: Token SSO ausente ou incompleto.");
+    die("Acesso negado: Token SSO ausente.");
 }
 
-// 3. Validação da Assinatura (HMAC-SHA256)
+// 3. Validação HMAC-SHA256
 $expectedSignature = hash_hmac('sha256', $payloadBase64, $ssoSecret);
-
 if (!hash_equals($expectedSignature, $signatureReceived)) {
     header("HTTP/1.1 403 Forbidden");
     die("Acesso negado: Assinatura SSO inválida.");
 }
 
-// 4. Decodificação e Validação de Expiração
+// 4. Decodificação
 $userData = json_decode(base64_decode($payloadBase64), true);
-
-if (!$userData || !isset($userData['exp'])) {
-    die("Acesso negado: Payload SSO malformado.");
+if (!$userData || time() > $userData['exp']) {
+    die("Acesso negado: Token malformado ou expirado.");
 }
 
-if (time() > $userData['exp']) {
-    die("Acesso negado: Token SSO expirado.");
-}
-
-// 5. Provisionamento Just-in-Time (JIT) e Login
+// 5. Política de Governança: Somente Cadastrados ou Visitantes Permitidos
 try {
-    // Mapear user_level string para inteiro, se necessário
-    if (isset($userData['user_level']) && !is_numeric($userData['user_level'])) {
-        $levelMap = [
-            'Administrador' => 1,
-            'Admin' => 1,
-            'Operador' => 2,
-            'Usuario' => 2
-        ];
-        $userData['user_level'] = $levelMap[$userData['user_level']] ?? 2;
-    }
-
     $userModel = new User();
-    $localUser = $userModel->findOrCreateFromSSO($userData);
+    $localUser = $userModel->findBySSO($userData['user_id'], $userData['user_email']);
 
-    // Iniciar Sessão Local PHP
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+    if (!$localUser) {
+        // Usuário não cadastrado. Verificar política de visitantes.
+        $allowVisitors = $userModel->getSetting('allow_visitors');
+
+        if ($allowVisitors === '1') {
+            // Entra como Consultor (Visualizador) Temporário (Sessão apenas)
+            $localUser = [
+                'id' => 0,
+                'nome' => $userData['user_name'] . ' (Visitante)',
+                'email' => $userData['user_email'],
+                'nivel_acesso' => 3 // Consultor
+            ];
+        } else {
+            die("<div style='font-family: sans-serif; text-align: center; padding: 50px;'>
+                    <h1>🔒 Acesso Restrito</h1>
+                    <p>Olá <b>{$userData['user_name']}</b>, você está autenticado no Portal, mas ainda não possui cadastro neste módulo.</p>
+                    <p>Por favor, solicite seu acesso ao administrador do sistema.</p>
+                 </div>");
+        }
+    } else {
+        // Usuário Cadastrado: Atualizar timestamp de acesso
+        $userModel->update($localUser['id'], ['ultimo_acesso' => date('Y-m-d H:i:s')]);
     }
+
+    // 6. Iniciar Sessão
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
     $_SESSION['user_id'] = $localUser['id'];
     $_SESSION['user_email'] = $localUser['email'];
@@ -76,10 +75,9 @@ try {
     $_SESSION['user_level'] = $localUser['nivel_acesso'];
     $_SESSION['sso_authenticated'] = true;
 
-    // Redirecionar para o dashboard principal na raiz
     header("Location: index.php");
     exit();
 
 } catch (Exception $e) {
-    die("Erro interno durante autenticação: " . $e->getMessage());
+    die("Erro interno: " . $e->getMessage());
 }

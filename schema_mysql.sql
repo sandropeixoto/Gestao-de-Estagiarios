@@ -143,12 +143,21 @@ CREATE TABLE IF NOT EXISTS users (
     sso_user_id INT NOT NULL UNIQUE,
     nome VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    nivel_acesso INT DEFAULT 2, -- 1: Admin, 2: Operador
+    nivel_acesso INT DEFAULT 3, -- 1: Admin, 2: Gestor, 3: Consultor
     ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5. Inserção de Dados Iniciais
+-- 5. Configurações Globais
+CREATE TABLE IF NOT EXISTS system_settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value VARCHAR(255),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO system_settings (setting_key, setting_value) VALUES ('allow_visitors', '1');
+
+-- 6. Inserção de Dados Iniciais
 INSERT INTO niveis_escolaridade (descricao) VALUES ('Médio'), ('Superior');
 INSERT INTO cargas_horarias (descricao, horas_diarias) VALUES ('4 Horas', 4), ('6 Horas', 6);
 INSERT INTO motivos_desligamento (descricao) VALUES 
