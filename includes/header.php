@@ -95,6 +95,14 @@ function isActive($path, $currentPath) {
                     <i class="fas fa-file-contract w-6 text-center"></i>
                     <span class="sidebar-label ml-3 font-medium">Contratos</span>
                 </a>
+
+                <?php if (canManageUsers()): ?>
+                <div class="px-6 pt-8 pb-2 text-slate-500 uppercase text-[10px] font-bold sidebar-label tracking-widest">Configurações</div>
+                <a href="<?= $baseUrl ?>modules/usuarios/index.php" class="flex items-center px-6 py-3 transition-all <?= isActive('modules/usuarios/', $currentPath) ?>">
+                    <i class="fas fa-user-shield w-6 text-center text-accent"></i>
+                    <span class="sidebar-label ml-3 font-medium text-slate-200">Gestão de Usuários</span>
+                </a>
+                <?php endif; ?>
             </nav>
 
             <!-- Collapse Toggle -->
