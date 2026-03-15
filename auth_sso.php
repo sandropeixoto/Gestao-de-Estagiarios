@@ -40,26 +40,44 @@ if (!$userData || time() > $userData['exp']) {
 // 5. Política de Governança: Somente Cadastrados ou Visitantes Permitidos
 try {
     $userModel = new User();
+    
+    // Mapear user_level string para inteiro antecipadamente para o bypass
+    $incomingLevel = 3; // Default Consultor
+    if (isset($userData['user_level'])) {
+        $levelMap = ['Administrador' => 1, 'Admin' => 1, 'Gestor' => 2];
+        $incomingLevel = is_numeric($userData['user_level']) ? $userData['user_level'] : ($levelMap[$userData['user_level']] ?? 3);
+    }
+
     $localUser = $userModel->findBySSO($userData['user_id'], $userData['user_email']);
 
     if (!$localUser) {
-        // Usuário não cadastrado. Verificar política de visitantes.
-        $allowVisitors = $userModel->getSetting('allow_visitors');
-
-        if ($allowVisitors === '1') {
-            // Entra como Consultor (Visualizador) Temporário (Sessão apenas)
-            $localUser = [
-                'id' => 0,
-                'nome' => $userData['user_name'] . ' (Visitante)',
+        // BYPASS: Se for Administrador no Portal, cadastrar automaticamente com poder total
+        if ($incomingLevel == 1) {
+            $userModel->createManual([
+                'nome' => $userData['user_name'],
                 'email' => $userData['user_email'],
-                'nivel_acesso' => 3 // Consultor
-            ];
+                'sso_user_id' => $userData['user_id'],
+                'nivel_acesso' => 1
+            ]);
+            $localUser = $userModel->findBySSO($userData['user_id'], $userData['user_email']);
         } else {
-            die("<div style='font-family: sans-serif; text-align: center; padding: 50px;'>
-                    <h1>🔒 Acesso Restrito</h1>
-                    <p>Olá <b>{$userData['user_name']}</b>, você está autenticado no Portal, mas ainda não possui cadastro neste módulo.</p>
-                    <p>Por favor, solicite seu acesso ao administrador do sistema.</p>
-                 </div>");
+            // Usuário não cadastrado. Verificar política de visitantes.
+            $allowVisitors = $userModel->getSetting('allow_visitors');
+
+            if ($allowVisitors === '1') {
+                $localUser = [
+                    'id' => 0,
+                    'nome' => $userData['user_name'] . ' (Visitante)',
+                    'email' => $userData['user_email'],
+                    'nivel_acesso' => 3 // Consultor
+                ];
+            } else {
+                die("<div style='font-family: sans-serif; text-align: center; padding: 50px;'>
+                        <h1>🔒 Acesso Restrito</h1>
+                        <p>Olá <b>{$userData['user_name']}</b>, você está autenticado no Portal, mas ainda não possui cadastro neste módulo.</p>
+                        <p>Por favor, solicite seu acesso ao administrador do sistema.</p>
+                     </div>");
+            }
         }
     } else {
         // Usuário Cadastrado: Atualizar timestamp de acesso
