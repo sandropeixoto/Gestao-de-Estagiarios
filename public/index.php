@@ -1,3 +1,20 @@
+<?php
+require_once __DIR__ . '/../src/Models/Contract.php';
+require_once __DIR__ . '/../config/database.php';
+
+use App\Models\Contract;
+
+$contractModel = new Contract();
+$contratos = $contractModel->allWithDetails();
+
+// KPI Data
+$db = Database::getConnection();
+$totalAtivos = $db->query("SELECT COUNT(*) FROM contracts WHERE status = 'Ativo'")->fetchColumn();
+$totalEstudantes = $db->query("SELECT COUNT(*) FROM students")->fetchColumn();
+$totalInstituicoes = $db->query("SELECT COUNT(*) FROM institutions WHERE status_convenio = 'Ativo'")->fetchColumn();
+$totalVagas = $db->query("SELECT COUNT(*) FROM positions WHERE status = 'Aberta'")->fetchColumn();
+
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -28,11 +45,11 @@
                     <span class="text-xl font-bold tracking-tight"><i class="fas fa-graduation-cap mr-2"></i>EstagiárioPlus</span>
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-                    <a href="estudantes.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Estudantes</a>
-                    <a href="instituicoes.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Instituições</a>
-                    <a href="vagas.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Vagas</a>
-                    <a href="contratos.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-white">Contratos</a>
+                    <a href="index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-white">Dashboard</a>
+                    <a href="modules/estudantes/index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Estudantes</a>
+                    <a href="modules/instituicoes/index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Instituições</a>
+                    <a href="modules/vagas/index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Vagas</a>
+                    <a href="modules/contratos/index.php" class="hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Contratos</a>
                 </div>
             </div>
         </div>
@@ -41,10 +58,10 @@
     <!-- Main Content Area -->
     <main class="flex-grow container mx-auto px-4 py-8">
         <div class="mb-8 flex justify-between items-center">
-            <h1 class="text-3xl font-bold text-gray-800">Contratos de Estágio</h1>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center">
+            <h1 class="text-3xl font-bold text-gray-800">Painel de Controle</h1>
+            <a href="modules/contratos/novo.php" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition-all flex items-center">
                 <i class="fas fa-plus mr-2"></i> Novo Contrato
-            </button>
+            </a>
         </div>
 
         <!-- Dashboard Cards -->
@@ -54,53 +71,98 @@
                     <i class="fas fa-file-signature text-xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Ativos</p>
-                    <p class="text-2xl font-bold text-gray-800">24</p>
+                    <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Contratos Ativos</p>
+                    <p class="text-2xl font-bold text-gray-800"><?= $totalAtivos ?></p>
                 </div>
             </div>
-            <!-- More cards... -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-3 bg-green-100 text-green-600 rounded-lg mr-4">
+                    <i class="fas fa-user-graduate text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Estudantes</p>
+                    <p class="text-2xl font-bold text-gray-800"><?= $totalEstudantes ?></p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-3 bg-purple-100 text-purple-600 rounded-lg mr-4">
+                    <i class="fas fa-university text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Instituições</p>
+                    <p class="text-2xl font-bold text-gray-800"><?= $totalInstituicoes ?></p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-3 bg-orange-100 text-orange-600 rounded-lg mr-4">
+                    <i class="fas fa-briefcase text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 font-medium uppercase tracking-wider">Vagas Abertas</p>
+                    <p class="text-2xl font-bold text-gray-800"><?= $totalVagas ?></p>
+                </div>
+            </div>
         </div>
 
-        <!-- Table Placeholder based on DB Schema -->
+        <!-- Recent Contracts Table -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800">Últimos Contratos Formalizados</h3>
+            </div>
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estagiário</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instituição</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carga H.</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instituição / Supervisor</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vigência</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bolsa</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <!-- Dynamic Rows will be here -->
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">João Silva</div>
-                            <div class="text-sm text-gray-500">Nível Superior</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Universidade Federal</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">01/01/2026 - 31/12/2026</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">6 Horas</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Ativo</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="#" class="text-blue-600 hover:text-blue-900 mr-3"><i class="fas fa-edit"></i></a>
-                            <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
+                    <?php if (empty($contratos)): ?>
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-gray-500">Nenhum contrato encontrado.</td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach (array_slice($contratos, 0, 10) as $c): ?>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900"><?= htmlspecialchars($c['estagiario']) ?></div>
+                                <div class="text-xs text-gray-500">ID: #<?= $c['id'] ?></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-700"><?= htmlspecialchars($c['instituicao']) ?></div>
+                                <div class="text-xs text-gray-500">Sup: <?= htmlspecialchars($c['supervisor_name']) ?></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <?= date('d/m/Y', strtotime($c['data_inicio'])) ?> - <?= date('d/m/Y', strtotime($c['data_fim'])) ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
+                                R$ <?= number_format($c['valor_bolsa'], 2, ',', '.') ?>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <?php 
+                                    $statusClass = $c['status'] == 'Ativo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+                                ?>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?= $statusClass ?>">
+                                    <?= $c['status'] ?>
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
+            <div class="p-4 bg-gray-50 text-center">
+                <a href="modules/contratos/index.php" class="text-sm text-blue-600 font-semibold hover:text-blue-800">Ver todos os contratos <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-white border-t border-gray-200 py-6">
         <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            &copy; 2026 EstagiárioPlus - Sistema de Gestão de Estágios.
+            &copy; 2026 EstagiárioPlus - Sistema de Gestão de Estágios. Ambientes MySQL Unificado.
         </div>
     </footer>
 </body>

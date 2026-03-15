@@ -1,38 +1,39 @@
-// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
-include_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/../models/TimeSheet.php';
+<?php
+/**
+ * TimeSheet Controller - Unified Pattern
+ * Orion Orchestrator: Transitioning legacy to App\Models
+ */
+
+require_once __DIR__ . '/../../src/Models/TimeSheet.php';
+
+use App\Models\TimeSheet;
 
 class TimeSheetController
 {
-    private $db;
-    private $timesheet;
+    private $timesheetModel;
 
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
-        $this->timesheet = new TimeSheet($this->db);
+        $this->timesheetModel = new TimeSheet();
     }
 
     public function register()
     {
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode(file_get_contents("php://input"), true);
 
-        $this->timesheet->contract_id = $data->contract_id;
-        $this->timesheet->date = $data->date;
-        $this->timesheet->hora_entrada = $data->hora_entrada;
-        $this->timesheet->hora_saida = $data->hora_saida;
-        $this->timesheet->geolocalizacao = $data->geolocalizacao;
-        $this->timesheet->is_dia_prova = $data->is_dia_prova; // Boolean passed from frontend
+        if (!$data) {
+            http_response_code(400);
+            echo json_encode(["message" => "Invalid JSON input."]);
+            return;
+        }
 
-        if ($this->timesheet->register()) {
+        if ($this->timesheetModel->register($data)) {
             http_response_code(201);
-            echo json_encode(array("message" => "TimeSheet registered."));
+            echo json_encode(["message" => "TimeSheet registered successfully."]);
         }
         else {
             http_response_code(400);
-            echo json_encode(array("message" => "Unable to register timesheet. Exceeds daily limit."));
+            echo json_encode(["message" => "Unable to register timesheet. Check daily limit (6h standard, 3h test day)."]);
         }
     }
 }
-?>

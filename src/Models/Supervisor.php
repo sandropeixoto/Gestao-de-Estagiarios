@@ -16,6 +16,17 @@ class Supervisor extends BaseModel {
         return $stmt->fetchAll();
     }
 
+    /**
+     * Conta estagiários ativos vinculados ao supervisor.
+     */
+    public function getActiveInternsCount($supervisorId) {
+        $sql = "SELECT COUNT(*) as total FROM contracts WHERE supervisor_id = :id AND status = 'Ativo'";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $supervisorId]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return (int)$row['total'];
+    }
+
     public function create($data) {
         $sql = "INSERT INTO supervisors (nome, cargo, email, telefone_ramal, lotacao_id) 
                 VALUES (:nome, :cargo, :email, :telefone_ramal, :lotacao_id)";

@@ -1,64 +1,59 @@
 <?php
-// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
-include_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/../models/Contract.php';
-include_once __DIR__ . '/../models/Evaluation.php';
+/**
+ * Dashboard Controller - Unified Pattern
+ * Orion Orchestrator: Transitioning legacy to App\Models and MySQL
+ */
+
+require_once __DIR__ . '/../../src/Models/Contract.php';
+require_once __DIR__ . '/../../src/Models/Evaluation.php';
+
+use App\Models\Contract;
+use App\Models\Evaluation;
 
 class DashboardController
 {
     private $db;
-    private $contract;
-    private $evaluation;
+    private $contractModel;
+    private $evaluationModel;
 
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
-        $this->contract = new Contract($this->db);
-        $this->evaluation = new Evaluation($this->db);
+        $this->db = \Database::getConnection();
+        $this->contractModel = new Contract();
+        $this->evaluationModel = new Evaluation();
     }
 
     public function getManagerStats()
     {
         try {
-            error_log("Dashboard: Starting...");
+            $expiring = $this->contractModel->getExpiringContracts();
+            $pending = $this->evaluationModel->getPendingEvaluations();
 
-            $expiring = $this->contract->getExpiringContracts();
-            error_log("Dashboard: Expiring contracts fetched. Count: " . count($expiring));
-
-            $pending = $this->evaluation->getPendingEvaluations();
-            error_log("Dashboard: Pending evaluations fetched. Count: " . count($pending));
-
-            // New Stats for Pro Dashboard
             // 1. Total Students
             $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM students");
             $stmt->execute();
             $totalStudents = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-            error_log("Dashboard: Total students: " . $totalStudents);
 
             // 2. Active Contracts
             $stmt = $this->db->prepare("SELECT COUNT(*) as total FROM contracts WHERE status = 'Ativo'");
             $stmt->execute();
             $activeContracts = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-            error_log("Dashboard: Active contracts: " . $activeContracts);
 
-            // 3. Contracts per Month
+            // 3. Contracts per Month (MySQL Optimized)
             $stmt = $this->db->prepare("
-                SELECT to_char(created_at, 'Mon') as name, COUNT(*) as contratos 
+                SELECT DATE_FORMAT(created_at, '%b') as name, COUNT(*) as contratos 
                 FROM contracts 
-                WHERE created_at > NOW() - INTERVAL '6 months' 
-                GROUP BY to_char(created_at, 'Mon'), date_trunc('month', created_at)
-                ORDER BY date_trunc('month', created_at)
+                WHERE created_at > DATE_SUB(NOW(), INTERVAL 6 MONTH) 
+                GROUP BY name, LAST_DAY(created_at)
+                ORDER BY LAST_DAY(created_at)
             ");
             $stmt->execute();
             $contractsChart = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            error_log("Dashboard: Contracts chart data fetched.");
 
             // 4. Students per Course
             $stmt = $this->db->prepare("SELECT curso as name, COUNT(*) as value FROM students GROUP BY curso");
             $stmt->execute();
             $coursesChart = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            error_log("Dashboard: Courses chart data fetched.");
 
             $response = [
                 "expiringContracts" => $expiring ?? [],

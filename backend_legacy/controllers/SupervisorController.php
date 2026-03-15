@@ -1,58 +1,66 @@
-// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
-include_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/../models/Supervisor.php';
+<?php
+/**
+ * Supervisor Controller - Unified Pattern
+ * Orion Orchestrator: Transitioning legacy to App\Models
+ */
+
+require_once __DIR__ . '/../../src/Models/Supervisor.php';
+
+use App\Models\Supervisor;
 
 class SupervisorController
 {
-    private $db;
-    private $supervisor;
+    private $supervisorModel;
 
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
-        $this->supervisor = new Supervisor($this->db);
+        $this->supervisorModel = new Supervisor();
     }
 
     public function create()
     {
-        $data = json_decode(file_get_contents("php://input"));
+        $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!empty($data->nome) && !empty($data->cargo) && !empty($data->area)) {
-            $this->supervisor->nome = $data->nome;
-            $this->supervisor->cargo = $data->cargo;
-            $this->supervisor->area = $data->area;
+        if (!empty($data['nome'])) {
+            // Note: Adapting legacy 'area' to potentially missing 'lotacao_id' or keeping as is
+            // If the legacy UI sends 'area', we might need a mapping, but for now let's use the schema fields.
+            $params = [
+                'nome' => $data['nome'],
+                'cargo' => $data['cargo'] ?? null,
+                'email' => $data['email'] ?? null,
+                'telefone_ramal' => $data['telefone_ramal'] ?? null,
+                'lotacao_id' => $data['lotacao_id'] ?? null
+            ];
 
-            if ($this->supervisor->create()) {
+            if ($this->supervisorModel->create($params)) {
                 http_response_code(201);
-                echo json_encode(array("message" => "Supervisor created."));
+                echo json_encode(["message" => "Supervisor created."]);
             }
             else {
                 http_response_code(503);
-                echo json_encode(array("message" => "Unable to create supervisor."));
+                echo json_encode(["message" => "Unable to create supervisor."]);
             }
         }
         else {
             http_response_code(400);
-            echo json_encode(array("message" => "Incomplete data."));
+            echo json_encode(["message" => "Incomplete data. Nome is required."]);
         }
     }
 
     public function getAll()
     {
-        $stmt = $this->supervisor->getAll();
-        echo json_encode($stmt);
+        $supervisors = $this->supervisorModel->allWithLotacao();
+        echo json_encode($supervisors);
     }
 
     public function assignIntern($supervisor_id)
     {
-        $activeInterns = $this->supervisor->getActiveInternsCount($supervisor_id);
+        $activeInterns = $this->supervisorModel->getActiveInternsCount($supervisor_id);
         if ($activeInterns >= 10) {
             http_response_code(400);
-            echo json_encode(array("message" => "Limite legal de 10 estagiários por supervisor excedido"));
+            echo json_encode(["message" => "Limite legal de 10 estagiários por supervisor excedido"]);
             return false;
         }
         return true;
     }
 }
-?>

@@ -1,43 +1,45 @@
-// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
-include_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/../models/Institution.php';
+<?php
+/**
+ * Institution Controller - Unified Pattern
+ * Orion Orchestrator: Transitioning legacy to App\Models
+ */
+
+require_once __DIR__ . '/../../src/Models/Institution.php';
+
+use App\Models\Institution;
 
 class InstitutionController
 {
-    private $db;
-    private $institution;
+    private $institutionModel;
 
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
-        $this->institution = new Institution($this->db);
+        $this->institutionModel = new Institution();
     }
 
     public function create()
     {
-        $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->razao_social) && !empty($data->cnpj)) {
-            $this->institution->razao_social = $data->razao_social;
-            $this->institution->cnpj = $data->cnpj;
-            $this->institution->coordenador_responsavel = $data->coordenador_responsavel ?? null;
-            $this->institution->status_convenio = $data->status_convenio ?? 'Ativo';
+        $data = json_decode(file_get_contents("php://input"), true);
 
-            if ($this->institution->create()) {
+        if (!empty($data['razao_social']) && !empty($data['cnpj'])) {
+            if ($this->institutionModel->create($data)) {
                 http_response_code(201);
-                echo json_encode(array("message" => "Institution created."));
+                echo json_encode(["message" => "Institution created successfully."]);
             }
             else {
                 http_response_code(503);
-                echo json_encode(array("message" => "Unable to create institution."));
+                echo json_encode(["message" => "Unable to create institution."]);
             }
+        }
+        else {
+            http_response_code(400);
+            echo json_encode(["message" => "Incomplete data. Razao Social and CNPJ are required."]);
         }
     }
 
     public function getAll()
     {
-        $stmt = $this->institution->getAll();
-        echo json_encode($stmt);
+        $institutions = $this->institutionModel->all();
+        echo json_encode($institutions);
     }
 }
-?>

@@ -1,6 +1,10 @@
 <?php
-// Use __DIR__ para garantir que o PHP encontre o arquivo independente de onde for chamado// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
-include_once __DIR__ . '/../config/database.php';
+/**
+ * Status Controller - Unified Pattern
+ * Orion Orchestrator: Reflecting unified MySQL connection
+ */
+
+require_once __DIR__ . '/../../config/database.php';
 
 class StatusController
 {
@@ -8,8 +12,7 @@ class StatusController
 
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
+        $this->db = \Database::getConnection();
     }
 
     public function check()
@@ -17,8 +20,8 @@ class StatusController
         if ($this->db) {
             echo json_encode([
                 "status" => "online",
-                "message" => "Connected to Supabase via PostgreSQL",
-                "database_type" => "pgsql"
+                "message" => "Connected to Unified MySQL Database",
+                "database_type" => "mysql"
             ]);
         }
         else {
@@ -30,4 +33,3 @@ class StatusController
         }
     }
 }
-?>

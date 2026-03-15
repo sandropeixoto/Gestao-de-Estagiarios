@@ -1,50 +1,45 @@
-// Use __DIR__ para caminhos absolutos baseados no diretório do arquivo
-include_once __DIR__ . '/../config/database.php';
-include_once __DIR__ . '/../models/Student.php';
+<?php
+/**
+ * Student Controller - Unified Pattern
+ * Orion Orchestrator: Transitioning legacy to App\Models
+ */
+
+require_once __DIR__ . '/../../src/Models/Student.php';
+
+use App\Models\Student;
 
 class StudentController
 {
-    private $db;
-    private $student;
+    private $studentModel;
 
     public function __construct()
     {
-        $database = new Database();
-        $this->db = $database->getConnection();
-        $this->student = new Student($this->db);
+        $this->studentModel = new Student();
     }
 
     public function create()
     {
-        $data = json_decode(file_get_contents("php://input"));
-        if (!empty($data->nome) && !empty($data->cpf)) {
-            $this->student->nome = $data->nome;
-            $this->student->cpf = $data->cpf;
-            $this->student->curso = $data->curso ?? null;
-            $this->student->semestre = $data->semestre ?? null;
-            $this->student->previsao_formatura = $data->previsao_formatura ?? null;
-            $this->student->dados_bancarios = $data->dados_bancarios ?? null;
-            $this->student->comprovante_matricula_path = $data->comprovante_matricula_path ?? null;
+        $data = json_decode(file_get_contents("php://input"), true);
 
-            if ($this->student->create()) {
+        if (!empty($data['nome']) && !empty($data['cpf'])) {
+            if ($this->studentModel->create($data)) {
                 http_response_code(201);
-                echo json_encode(array("message" => "Student created."));
+                echo json_encode(["message" => "Student created successfully."]);
             }
             else {
                 http_response_code(503);
-                echo json_encode(array("message" => "Unable to create student."));
+                echo json_encode(["message" => "Unable to create student."]);
             }
         }
         else {
             http_response_code(400);
-            echo json_encode(array("message" => "Incomplete data."));
+            echo json_encode(["message" => "Incomplete data. Nome and CPF are required."]);
         }
     }
 
     public function getAll()
     {
-        $stmt = $this->student->getAll();
-        echo json_encode($stmt);
+        $students = $this->studentModel->all();
+        echo json_encode($students);
     }
 }
-?>
