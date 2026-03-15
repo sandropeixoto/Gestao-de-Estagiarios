@@ -14,11 +14,12 @@ if (function_exists('loadEnv')) {
 
 use App\Models\User;
 
-// 1. Configuração do Segredo
-$ssoSecret = getenv('SSO_SECRET_KEY');
-if (!$ssoSecret) {
-    die("Erro de Configuração: SSO_SECRET_KEY não definida no ambiente.");
+// 1. Configuração do Segredo (Definição Direta para Integridade Total)
+if (!defined('SSO_SECRET_KEY')) {
+    define('SSO_SECRET_KEY', 'GestorGov_Secure_Integration_Token_2026!');
 }
+
+$ssoSecret = SSO_SECRET_KEY;
 
 // 2. Captura dos Parâmetros
 $payloadBase64 = $_GET['sso_payload'] ?? null;
