@@ -76,8 +76,8 @@ try {
     $_SESSION['user_level'] = $localUser['nivel_acesso'];
     $_SESSION['sso_authenticated'] = true;
 
-    // Redirecionar para o dashboard principal
-    header("Location: public/index.php");
+    // Redirecionar para o dashboard principal na raiz
+    header("Location: index.php");
     exit();
 
 } catch (Exception $e) {
