@@ -23,8 +23,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <thead class="bg-gray-50 text-gray-500 text-xs font-bold uppercase tracking-wider">
             <tr>
                 <th class="px-6 py-4 text-left">Lotação / Unidade</th>
-                <th class="px-6 py-4 text-left">Nível / Carga H.</th>
-                <th class="px-6 py-4 text-center">Qtd / Bolsa</th>
+                <th class="px-6 py-4 text-center">Quantidade</th>
                 <th class="px-6 py-4 text-center">Status</th>
                 <th class="px-6 py-4 text-center">Ações</th>
             </tr>
@@ -32,7 +31,7 @@ require_once __DIR__ . '/../../includes/header.php';
         <tbody class="bg-white divide-y divide-gray-100">
             <?php if (empty($vagas)): ?>
                 <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                    <td colspan="4" class="px-6 py-12 text-center text-gray-400">
                         <i class="fas fa-briefcase text-4xl mb-4 block"></i>
                         Nenhuma vaga registrada.
                     </td>
@@ -43,13 +42,8 @@ require_once __DIR__ . '/../../includes/header.php';
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                             <?= htmlspecialchars($v['subunidade']) ?>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-800 font-medium"><?= htmlspecialchars($v['nivel']) ?></div>
-                            <div class="text-xs text-indigo-600 font-bold uppercase"><?= htmlspecialchars($v['carga_horaria']) ?></div>
-                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <div class="text-sm font-bold text-gray-900"><?= $v['quantidade'] ?> vaga(s)</div>
-                            <div class="text-xs text-gray-500">R$ <?= number_format($v['remuneracao_base'], 2, ',', '.') ?></div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="px-2.5 py-1 text-xs font-bold rounded-full 

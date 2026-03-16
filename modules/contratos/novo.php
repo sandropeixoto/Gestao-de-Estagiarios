@@ -6,12 +6,12 @@ $db = Database::getConnection();
 $estudantes = $db->query("SELECT id, nome FROM students ORDER BY nome")->fetchAll();
 $instituicoes = $db->query("SELECT id, razao_social FROM institutions WHERE status_convenio = 'Ativo' ORDER BY razao_social")->fetchAll();
 $supervisores = $db->query("SELECT id, nome FROM supervisors ORDER BY nome")->fetchAll();
-$vagas = $db->query("SELECT p.id, l.subunidade, n.descricao as nivel 
+$vagas = $db->query("SELECT p.id, l.subunidade 
                      FROM positions p 
                      JOIN lotacoes l ON p.lotacao_id = l.id 
-                     JOIN niveis_escolaridade n ON p.nivel_escolaridade_id = n.id
                      WHERE p.status = 'Aberta'")->fetchAll();
 $cargas = $db->query("SELECT id, descricao FROM cargas_horarias")->fetchAll();
+$niveis = $db->query("SELECT id, descricao FROM niveis_escolaridade")->fetchAll();
 
 require_once __DIR__ . '/../../includes/header.php';
 ?>
@@ -60,7 +60,7 @@ require_once __DIR__ . '/../../includes/header.php';
                         <select name="position_id" required class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-slate-500 outline-none">
                             <option value="">Selecione a Vaga Aberta</option>
                             <?php foreach($vagas as $v): ?>
-                                <option value="<?= $v['id'] ?>"><?= htmlspecialchars($v['subunidade']) ?> - <?= htmlspecialchars($v['nivel']) ?></option>
+                                <option value="<?= $v['id'] ?>"><?= htmlspecialchars($v['subunidade']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -81,6 +81,16 @@ require_once __DIR__ . '/../../includes/header.php';
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="md:col-span-3 text-sm font-bold text-slate-500 uppercase tracking-wider border-b pb-2">Condições e Vigência</div>
                 
+                <div class="space-y-1">
+                    <label class="text-sm font-semibold text-gray-700">Nível de Escolaridade</label>
+                    <select name="nivel_escolaridade_id" required class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-slate-500 outline-none">
+                        <option value="">Selecione o Nível</option>
+                        <?php foreach($niveis as $n): ?>
+                            <option value="<?= $n['id'] ?>"><?= $n['descricao'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
                 <div class="space-y-1">
                     <label class="text-sm font-semibold text-gray-700">Carga Horária</label>
                     <select name="carga_horaria_id" required class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-slate-500 outline-none">

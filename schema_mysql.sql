@@ -67,16 +67,11 @@ CREATE TABLE IF NOT EXISTS supervisors (
 CREATE TABLE IF NOT EXISTS positions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     lotacao_id INT NOT NULL,
-    nivel_escolaridade_id INT NOT NULL,
-    carga_horaria_id INT NOT NULL,
     quantidade INT DEFAULT 1,
-    remuneracao_base DECIMAL(10, 2),
     requisitos TEXT,
     status ENUM('Aberta', 'Ocupada', 'Suspensa') DEFAULT 'Aberta',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (lotacao_id) REFERENCES lotacoes(id) ON DELETE CASCADE,
-    FOREIGN KEY (nivel_escolaridade_id) REFERENCES niveis_escolaridade(id),
-    FOREIGN KEY (carga_horaria_id) REFERENCES cargas_horarias(id)
+    FOREIGN KEY (lotacao_id) REFERENCES lotacoes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS contracts (
@@ -85,6 +80,7 @@ CREATE TABLE IF NOT EXISTS contracts (
     institution_id INT NOT NULL,
     supervisor_id INT NOT NULL,
     position_id INT NOT NULL,
+    nivel_escolaridade_id INT NOT NULL,
     carga_horaria_id INT NOT NULL,
     data_inicio DATE NOT NULL,
     data_fim DATE NOT NULL,
@@ -98,6 +94,7 @@ CREATE TABLE IF NOT EXISTS contracts (
     FOREIGN KEY (institution_id) REFERENCES institutions(id) ON DELETE CASCADE,
     FOREIGN KEY (supervisor_id) REFERENCES supervisors(id) ON DELETE CASCADE,
     FOREIGN KEY (position_id) REFERENCES positions(id) ON DELETE CASCADE,
+    FOREIGN KEY (nivel_escolaridade_id) REFERENCES niveis_escolaridade(id),
     FOREIGN KEY (carga_horaria_id) REFERENCES cargas_horarias(id),
     FOREIGN KEY (motivo_desligamento_id) REFERENCES motivos_desligamento(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

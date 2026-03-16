@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'institution_id' => (int)$_POST['institution_id'],
         'supervisor_id' => (int)$_POST['supervisor_id'],
         'position_id' => (int)$_POST['position_id'],
+        'nivel_escolaridade_id' => (int)$_POST['nivel_escolaridade_id'],
         'carga_horaria_id' => (int)$_POST['carga_horaria_id'],
         'data_inicio' => $_POST['data_inicio'],
         'data_fim' => $_POST['data_fim'],

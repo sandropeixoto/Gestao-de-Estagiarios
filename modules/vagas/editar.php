@@ -26,8 +26,6 @@ $infoLotacao = $lotacaoAtual->fetch();
 
 $unidades = $db->query("SELECT DISTINCT unidade FROM lotacoes WHERE unidade IS NOT NULL AND unidade != '' ORDER BY unidade")->fetchAll();
 $todasLotacoes = $db->query("SELECT id, subunidade, unidade FROM lotacoes ORDER BY subunidade")->fetchAll();
-$niveis = $db->query("SELECT id, descricao FROM niveis_escolaridade")->fetchAll();
-$cargas = $db->query("SELECT id, descricao FROM cargas_horarias")->fetchAll();
 
 require_once __DIR__ . '/../../includes/header.php';
 ?>
@@ -67,28 +65,6 @@ require_once __DIR__ . '/../../includes/header.php';
                 <div class="space-y-2">
                     <label class="text-sm font-semibold text-gray-700">Quantidade de Vagas</label>
                     <input type="number" name="quantidade" value="<?= $vaga['quantidade'] ?>" min="1" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Nível de Escolaridade</label>
-                    <select name="nivel_escolaridade_id" required class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        <?php foreach($niveis as $n): ?>
-                            <option value="<?= $n['id'] ?>" <?= $n['id'] == $vaga['nivel_escolaridade_id'] ? 'selected' : '' ?>><?= $n['descricao'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Carga Horária</label>
-                    <select name="carga_horaria_id" required class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        <?php foreach($cargas as $c): ?>
-                            <option value="<?= $c['id'] ?>" <?= $c['id'] == $vaga['carga_horaria_id'] ? 'selected' : '' ?>><?= $c['descricao'] ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-sm font-semibold text-gray-700">Remuneração Base (R$)</label>
-                    <input type="number" step="0.01" name="remuneracao_base" value="<?= $vaga['remuneracao_base'] ?>" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
 
                 <div class="space-y-2">

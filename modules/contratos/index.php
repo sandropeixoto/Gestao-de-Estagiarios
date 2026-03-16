@@ -48,7 +48,10 @@ require_once __DIR__ . '/../../includes/header.php';
                             <div class="text-sm text-gray-700">
                                 <?= date('d/m/Y', strtotime($c['data_inicio'])) ?> - <?= date('d/m/Y', strtotime($c['data_fim'])) ?>
                             </div>
-                            <div class="text-xs font-bold text-slate-500 uppercase"><?= htmlspecialchars($c['carga_horaria']) ?></div>
+                            <div class="flex items-center space-x-2">
+                                <div class="text-xs font-bold text-slate-500 uppercase"><?= htmlspecialchars($c['carga_horaria']) ?></div>
+                                <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold"><?= htmlspecialchars($c['nivel']) ?></span>
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-bold text-gray-900">R$ <?= number_format($c['valor_bolsa'], 2, ',', '.') ?></div>
