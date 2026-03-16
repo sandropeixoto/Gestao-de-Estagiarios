@@ -1,44 +1,66 @@
-# Gestão de Estagiários
+# 🎓 EstagiárioPlus - Gestão Inteligente de Estágios
 
-Sistema moderno e escalável para a gestão completa do ciclo de vida de estágios, administrando estudantes, instituições concedentes, supervisores e os contratos firmados entre eles.
+O **EstagiárioPlus** é uma plataforma corporativa de alto desempenho projetada para gerir o ciclo de vida completo de programas de estágio, garantindo conformidade legal (Lei do Estágio) e eficiência administrativa.
+
+---
 
 ## 🚀 Visão Geral
-A plataforma automatiza e centraliza a gestão de estágios. Originalmente construído sobre uma arquitetura legada, o projeto foi modernizado para utilizar o **Supabase** (PostgreSQL) como banco de dados principal, garantindo maior performance, segurança e escalabilidade.
+O sistema atua como ponto central entre Estudantes, Instituições, Empresas e Supervisores. Com uma arquitetura moderna e segura, automatiza desde a abertura de vagas até o controle de frequência por geolocalização.
+
+## 🏛️ Arquitetura do Sistema
+O projeto segue uma estrutura híbrida e modular para garantir estabilidade e evolução tecnológica:
+
+- **Core & Business Logic:** PHP 8.3+ com arquitetura modular baseada em domínio (`/modules/`).
+- **Modernização Frontend:** SPA construída com React 19, Vite e Tailwind CSS 4.
+- **Banco de Dados:** PostgreSQL / MySQL com integridade referencial rigorosa.
+- **Segurança:** Autenticação via SSO e RBAC (Role-Based Access Control).
+- **Infraestrutura:** Dockerizado para deploy em GCP (Google Cloud Run/Build).
+
+---
+
+## 📂 Estrutura de Pastas Principal
+- `/modules/`: Módulos independentes de negócio (Contratos, Estudantes, Vagas, etc.).
+- `/frontend/`: Aplicação moderna em React.
+- `/src/Models/`: Camada de dados centralizada.
+- `/public/`: Entrypoint do servidor e autenticação.
+- `/backend_legacy/`: Componentes originais em fase de migração.
+
+---
 
 ## 🛠️ Stack Tecnológica
+- **Backend:** PHP 8+ (Core), Node.js (API de modernização).
+- **Frontend:** React, Vite, Tailwind CSS, Lucide Icons.
+- **Banco de Dados:** PostgreSQL (Supabase) / MySQL.
+- **DevOps:** Docker, Cloud Build, Google Cloud Platform.
 
-- **Frontend:** React.js, Vite, Tailwind CSS, Lucide React (ícones), Axios.
-- **Backend:** Node.js, Express.js, TypeScript.
-- **Database & Auth:** Supabase (PostgreSQL).
+---
 
-## 📦 Instalação e Configuração
+## 📖 Documentação Adicional
+Para detalhes mais profundos, consulte:
+- [📄 PRD (Product Requirements Document)](docs/PRD.md)
+- [📖 Guia do Usuário](docs/USER_GUIDE.md)
+- [🏗️ Arquitetura e Padrões Técnicos](ARCHITECTURE.md)
+- [📋 Regras de Negócio](BUSINESS_RULES.md)
+- [💎 Guia de Replicação de UI](UI_UX_REPLICATION_GUIDE.md)
 
-O projeto é estruturado em dois monorepos lógicos (Frontend e Backend). Siga as etapas abaixo para execução local.
+---
 
-### 1. Configuração do Backend
-```bash
-cd backend
-npm install
-```
-Certifique-se de configurar o arquivo `.env` na raiz da pasta `backend` com as seguintes variáveis:
-```env
-SUPABASE_URL=sua_url_aqui
-SUPABASE_ANON_KEY=sua_chave_aqui
-PORT=porta_do_servidor
-```
-Para iniciar o servidor:
-```bash
-npm run dev
-```
+## 📦 Como Executar (Ambiente de Desenvolvimento)
 
-### 2. Configuração do Frontend
-Em um novo terminal:
-```bash
-cd frontend
-npm install
-```
-Para iniciar a interface:
-```bash
-npm run dev
-```
-A aplicação estará disponível por padrão em `http://localhost:5173`.
+### Requisitos
+- PHP 8.1+ ou Docker.
+- Node.js 18+.
+
+### Passos
+1. **Clonar Repositório:** `git clone ...`
+2. **Backend/PHP:** Configure o seu servidor local para apontar para `/public/`.
+3. **Frontend (React):**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+4. **Variáveis de Ambiente:** Copie `.env.example` para `.env` e configure suas credenciais.
+
+---
+*EstagiárioPlus - 2026. Desenvolvido com @aiox-framework.*
